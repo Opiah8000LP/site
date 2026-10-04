@@ -5,6 +5,21 @@
     try { fn(); } catch (e) { console.error('[dweeb] ' + name + ' broke:', e); }
   }
 
+  safe('missing files', function () {
+    var miss = (window.__miss || []).slice();
+    if (!window.__miss) miss.push('js/guard.js');
+    [['tile', 'util'], ['audio', 'audio'], ['vis', 'visualizer'], ['nav', 'navigation'], ['player', 'player'], ['particles', 'particles'], ['boot', 'boot']].forEach(function (p) {
+      var f = 'js/' + p[1] + '.js';
+      if (!DW[p[0]] && miss.indexOf(f) < 0) miss.push(f);
+    });
+    if (!miss.length) return;
+    var w = document.createElement('div');
+    w.id = 'warn';
+    w.textContent = 'FILES MISSING ON YOUR SITE: ' + miss.join(', ') + ' - upload them, then hard refresh (ctrl+shift+r)';
+    document.body.appendChild(w);
+    setTimeout(function () { w.remove(); }, 40000);
+  });
+
   safe('clock', function () {
     function clock() {
       var d = new Date(), z = function (n) { return n < 10 ? '0' + n : n; };
@@ -45,7 +60,8 @@
       d.textContent = 'playing  ' + A.playing + '\nengine   ' + A.state() + '\nanalyser ' + !!A.analyser +
         '\nbass ' + f(S.bass) + '  mid ' + f(S.mid) + '  high ' + f(S.high) +
         '\nbeats ' + S.beats + '  bpm ' + Math.round(60000 / S.interval) + '  speed ' + f(S.speed) +
-        '\nreduced-motion ' + (DW.reduce ? 'ON' : 'off') + '  low-power ' + DW.low + '  master ' + DW.react.master;
+        '\nreduced-motion ' + (DW.reduce ? 'ON' : 'off') + '  low-power ' + DW.low + '  master ' + DW.react.master +
+        '\nframes ' + DW.vis.frames + '  engine-error ' + (DW.vis.err || 'none');
     }, 250);
   });
 
