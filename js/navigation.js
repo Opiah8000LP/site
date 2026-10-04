@@ -30,7 +30,7 @@
     t.textContent = msg;
     t.classList.add('show');
     clearTimeout(tt);
-    tt = setTimeout(function () { t.classList.remove('show'); }, 2300);
+    tt = setTimeout(function () { t.classList.remove('show'); }, 2300 + msg.length * 45);
   };
 
   function safe(u) {
@@ -47,8 +47,8 @@
       cat.dataset.k = k;
       cat.style.setProperty('--k', k);
 
-      var ico = el('div', 'cat-ico'), fl = el('div', 'fl');
-      fl.appendChild(img(c.id, true));
+      var ico = el('div', 'cat-ico'), fl = el('div', 'fl'), ci2 = img(c.id, true);
+      fl.appendChild(ci2);
       ico.appendChild(fl);
 
       var subs = el('div', 'subs'), list = [];
@@ -56,21 +56,22 @@
         var s = el('div', 'sub');
         s.dataset.j = j;
         s.style.setProperty('--j', j);
-        var si = el('div', 'sub-ico');
-        si.appendChild(img(id));
-        var sn = el('div', 'sub-name');
-        sn.appendChild(el('span', null, id.toUpperCase()));
+        var si = el('div', 'sub-ico'), simg = img(id);
+        si.appendChild(simg);
+        var sn = el('div', 'sub-name'), span = el('span', null, id.toUpperCase());
+        sn.appendChild(span);
         s.appendChild(sn);
         s.appendChild(si);
         subs.appendChild(s);
-        list.push({ el: s, id: id, url: c.subs[id] });
+        list.push({ el: s, id: id, url: c.subs[id], img: simg, nm: span });
       });
 
+      var cname = el('div', 'cat-name', c.id.toUpperCase());
       cat.appendChild(ico);
-      cat.appendChild(el('div', 'cat-name', c.id.toUpperCase()));
+      cat.appendChild(cname);
       cat.appendChild(subs);
       root.appendChild(cat);
-      cats.push({ el: cat, id: c.id, ico: ico, subs: list });
+      cats.push({ el: cat, id: c.id, ico: ico, img: ci2, name: cname, subs: list });
       memo.push(0);
     });
     readMax();
@@ -99,9 +100,28 @@
         s.el.classList.toggle('hid', o === 0);
       });
     });
-    var cur = cats[ci], sel = cur.subs[memo[ci]];
-    DW.vis.bind('icon', cur.ico.querySelector('.ico'));
-    DW.vis.bind('sub', sel.el.querySelector('.sub-ico .ico'));
+    react();
+  }
+
+  function react() {
+    var V = DW.vis, cur = cats[ci], sel = cur.subs[memo[ci]];
+    var oc = [], od = [], os = [], osd = [], nm = [], nd = [];
+    cats.forEach(function (c, k) {
+      var d = Math.abs(k - ci);
+      if (d && d < 4) { oc.push(c.img); od.push(d); }
+    });
+    cur.subs.forEach(function (s, j) {
+      var e = j - memo[ci];
+      if (e < 0 || e > maxd) return;
+      nm.push(s.nm); nd.push(e);
+      if (e) { os.push(s.img); osd.push(e); }
+    });
+    V.bind('icon', cur.img);
+    V.bind('cats', oc, od);
+    V.bind('catname', cur.name);
+    V.bind('sub', sel.img);
+    V.bind('subs', os, osd);
+    V.bind('names', nm, nd);
   }
 
   function bump(axis, dir) {
