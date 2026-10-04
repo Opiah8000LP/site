@@ -34,7 +34,15 @@
   function mk() {
     if (ctx) return;
     var AC = window.AudioContext || window.webkitAudioContext;
-    if (AC) ctx = new AC();
+    if (!AC) return;
+    ctx = new AC();
+
+    ctx.onstatechange = tryConnect;
+  }
+
+  function tryConnect() {
+    if (!ctx || ctx.state !== 'running') return;
+    try { connect(); } catch (e) { console.warn('no analyser', e); }
   }
 
   function connect() {
@@ -53,12 +61,10 @@
   function wire() {
     mk();
     if (!ctx) return Promise.resolve();
+    tryConnect();
+    if (ctx.state === 'running') return Promise.resolve();
     var wait = new Promise(function (r) { setTimeout(r, 350); });
-    return Promise.race([ctx.resume().catch(function () {}), wait]).then(function () {
-      if (ctx.state === 'running') {
-        try { connect(); } catch (e) { console.warn('no analyser', e); }
-      }
-    });
+    return Promise.race([ctx.resume().catch(function () {}), wait]).then(tryConnect);
   }
   A.wire = wire;
   A.state = function () { return ctx ? ctx.state : 'none'; };
@@ -193,11 +199,13 @@
   }
 
   A.arm = function () {
-    var evs = ['pointerdown', 'keydown', 'touchend'];
+    var evs = ['pointerup', 'touchend', 'click', 'keydown'], started = false;
     function go() {
-      evs.forEach(function (e) { removeEventListener(e, go, true); });
-      if (A.userPaused) return;
-      if (A.playing) wire(); else A.play();
+      if (!started && !A.userPaused && !A.playing) { started = true; A.play(); }
+      else wire();
+      if (A.analyser || !(window.AudioContext || window.webkitAudioContext)) {
+        evs.forEach(function (e) { removeEventListener(e, go, true); });
+      }
     }
     evs.forEach(function (e) { addEventListener(e, go, true); });
   };
