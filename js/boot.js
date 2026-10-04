@@ -1,46 +1,128 @@
 (function () {
   var DW = window.DW;
-  var MIN = 3200;
+  function $(id) { return document.getElementById(id); }
 
   DW.boot = function (cb) {
-    var b = document.getElementById('boot');
-    var fill = document.getElementById('load-fill'), txt = document.getElementById('load-txt');
+    var I = DW.intro || {};
+    var b = $('boot'), vid = $('intro'), gate = $('gate'), skip = $('skip');
+    var fill = $('load-fill'), txt = $('load-txt');
+    var total = 0, done = 0, armed = false, ready = false, over = false, introURL = '', wd = 0;
 
-    var urls = [];
-    DW.menu.forEach(function (c) {
-      urls.push('icons/' + c.id + '.png');
-      Object.keys(c.subs).forEach(function (s) { urls.push('icons/' + s + '.png'); });
-    });
-    urls.push('icons/eyes.png', 'icons/_default.png', 'covers/default.png');
-    urls = urls.filter(function (u, i) { return urls.indexOf(u) === i; });
-
-    var done = 0;
-    urls.forEach(function (u) {
-      var i = new Image();
-      i.onload = i.onerror = function () { done++; };
-      i.src = u;
-    });
-
-    function finish() {
-      setTimeout(function () {
-        b.classList.add('end');
-        setTimeout(function () {
-          b.classList.add('gone');
-          cb();
-          setTimeout(function () { b.classList.add('dead'); }, 1150);
-        }, 650);
-      }, 350);
+    function paint() {
+      fill.style.transform = 'scaleX(' + (total ? done / total : 0).toFixed(3) + ')';
+      txt.textContent = 'Downloading ' + done + '/' + total + ' content!';
     }
 
-    var t0 = performance.now();
-    b.classList.add('go');
-    (function loop(t) {
-      var el = t - t0;
-      var real = el > 8000 ? 1 : done / urls.length;
-      var p = Math.min(real, el / MIN);
-      fill.style.transform = 'scaleX(' + p.toFixed(3) + ')';
-      txt.textContent = p >= 1 ? 'READY' : 'LOADING ' + Math.floor(p * 100) + '%';
-      if (p < 1) requestAnimationFrame(loop); else finish();
-    })(t0);
+    function job(ms) {
+      var d = false;
+      total++;
+      var f = function () {
+        if (d) return;
+        d = true; done++;
+        paint(); check();
+      };
+      if (ms) setTimeout(f, ms);
+      return f;
+    }
+
+    [].forEach.call(document.querySelectorAll('#cats img, #top img'), function (img) {
+      var f = job(15000);
+      if (img.complete) f();
+      else { img.addEventListener('load', f); img.addEventListener('error', f); }
+    });
+
+    DW.tracks.forEach(function (t) {
+      var f = job(15000), i = new Image();
+      i.onload = i.onerror = f;
+      i.src = DW.audio.cover(t);
+    });
+
+    if (DW.tracks.length) {
+      var fa = job(5000), el = DW.audio.el;
+      if (el.readyState >= 3) fa();
+      else {
+        el.addEventListener('canplaythrough', fa, { once: true });
+        el.addEventListener('error', fa, { once: true });
+      }
+    }
+
+    if (I.src) {
+      var fv = job(90000);
+      fetch(I.src)
+        .then(function (r) { if (!r.ok) throw 0; return r.blob(); })
+        .then(function (bl) { introURL = URL.createObjectURL(bl); })
+        .catch(function () {})
+        .then(fv);
+    }
+
+    function check() {
+      if (!armed || ready || done < total) return;
+      ready = true;
+      txt.textContent = 'Download complete!';
+      setTimeout(afterDownload, 500);
+    }
+
+    function afterDownload() {
+      if (!introURL) return finish();
+      if (!I.gate) return play(false);
+      gate.hidden = false;
+      function go() {
+        removeEventListener('pointerdown', go, true);
+        removeEventListener('keydown', go, true);
+        play(true);
+      }
+      addEventListener('pointerdown', go, true);
+      addEventListener('keydown', go, true);
+    }
+
+    function play(gesture) {
+      if (gesture && DW.audio.unlock) DW.audio.unlock();
+      gate.hidden = true;
+      $('dl').hidden = true;
+      vid.src = introURL;
+      vid.hidden = false;
+      vid.muted = false;
+      vid.addEventListener('ended', finish);
+      vid.addEventListener('error', finish);
+      var p = vid.play();
+      if (p && p.catch) p.catch(function () {
+        vid.muted = true;
+        vid.play().catch(finish);
+      });
+
+      if (I.skip) {
+        skip.hidden = false;
+        setTimeout(function () {
+          addEventListener('pointerdown', finish, true);
+          addEventListener('keydown', finish, true);
+        }, 1200);
+      }
+
+      var last = -1, still = 0;
+      wd = setInterval(function () {
+        if (vid.currentTime === last) still++; else still = 0;
+        last = vid.currentTime;
+        if (still >= 8) finish();
+      }, 1000);
+    }
+
+    function finish() {
+      if (over) return;
+      over = true;
+      clearInterval(wd);
+      removeEventListener('pointerdown', finish, true);
+      removeEventListener('keydown', finish, true);
+      b.classList.add('gone');
+      cb();
+      setTimeout(function () {
+        b.classList.add('dead');
+        try { vid.pause(); vid.removeAttribute('src'); vid.load(); } catch (e) {}
+        if (introURL) URL.revokeObjectURL(introURL);
+      }, 1200);
+    }
+
+    paint();
+    armed = true;
+    check();
   };
 })();
