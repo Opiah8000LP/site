@@ -1,0 +1,138 @@
+(function () {
+  var DW = window.DW, A = (DW.audio = {});
+  var el = new Audio(), ctx, src, an, gain;
+  var vol = 0.8, idx = 0, loopOne = false, errs = 0, want = false, subs = {};
+
+  A.el = el;
+  A.playing = false;
+  A.analyser = null;
+  A.userPaused = false;
+  el.preload = 'auto';
+
+  try {
+    var sv = parseFloat(localStorage.getItem('dw-vol'));
+    if (sv >= 0 && sv <= 1) vol = sv;
+  } catch (e) {}
+  el.volume = vol;
+
+  A.on = function (n, f) { (subs[n] = subs[n] || []).push(f); };
+  function emit(n, a) { (subs[n] || []).forEach(function (f) { f(a); }); }
+
+  A.cover = function (t) { return 'covers/' + t.file.replace(/\.[^.]+$/, '') + '.png'; };
+  A.index = function () { return idx; };
+  A.current = function () { return DW.tracks[idx]; };
+  A.loop = function (v) { if (v !== undefined) loopOne = !!v; return loopOne; };
+
+  A.volume = function (v) {
+    if (v === undefined) return vol;
+    vol = Math.max(0, Math.min(1, v));
+    if (gain) gain.gain.value = vol; else el.volume = vol;
+    try { localStorage.setItem('dw-vol', vol); } catch (e) {}
+  };
+
+  function mk() {
+    if (ctx) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) ctx = new AC();
+  }
+
+  function connect() {
+    if (src || !ctx) return;
+    src = ctx.createMediaElementSource(el);
+    an = ctx.createAnalyser();
+    an.fftSize = DW.low ? 512 : 1024;
+    an.smoothingTimeConstant = 0.35;
+    gain = ctx.createGain();
+    gain.gain.value = vol;
+    el.volume = 1;
+    src.connect(an); an.connect(gain); gain.connect(ctx.destination);
+    A.analyser = an;
+  }
+
+  function wire() {
+    mk();
+    if (!ctx) return Promise.resolve();
+    var wait = new Promise(function (r) { setTimeout(r, 350); });
+    return Promise.race([ctx.resume().catch(function () {}), wait]).then(function () {
+      if (ctx.state === 'running') {
+        try { connect(); } catch (e) { console.warn('no analyser', e); }
+      }
+    });
+  }
+  A.wire = wire;
+
+  A.play = function () {
+    A.userPaused = false;
+    want = true;
+    return wire().then(function () { return el.play(); }).catch(function (e) {
+      emit(e && e.name === 'NotAllowedError' ? 'blocked' : 'error', e);
+    });
+  };
+  A.pause = function () { A.userPaused = true; want = false; el.pause(); };
+  A.toggle = function () { if (el.paused) A.play(); else A.pause(); };
+
+  A.load = function (i, go) {
+    var n = DW.tracks.length;
+    if (!n) return;
+    idx = ((i % n) + n) % n;
+    var t = DW.tracks[idx];
+    el.src = 'audio/' + t.file;
+    emit('track', t);
+    media(t);
+    if (go) A.play();
+  };
+  A.next = function () { A.load(idx + 1, true); };
+  A.prev = function () {
+    if (el.currentTime > 3) el.currentTime = 0;
+    else A.load(idx - 1, true);
+  };
+  A.seek = function (f) {
+    if (isFinite(el.duration)) el.currentTime = Math.max(0, Math.min(1, f)) * el.duration;
+  };
+
+  el.addEventListener('play', function () { A.playing = true; emit('state'); });
+  el.addEventListener('pause', function () { A.playing = false; emit('state'); });
+  el.addEventListener('playing', function () { errs = 0; });
+  el.addEventListener('timeupdate', function () { emit('time'); });
+  el.addEventListener('loadedmetadata', function () { emit('time'); });
+  el.addEventListener('ended', function () {
+    if (loopOne) { el.currentTime = 0; el.play(); }
+    else A.load(idx + 1, true);
+  });
+  el.addEventListener('error', function () {
+    errs++;
+    emit('error');
+    if (DW.tracks.length > 1 && errs < DW.tracks.length) {
+      setTimeout(function () { A.load(idx + 1, want); }, 300);
+    }
+  });
+
+  function media(t) {
+    if (!('mediaSession' in navigator)) return;
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: t.title,
+        artist: t.artist || DW.siteName,
+        artwork: [{ src: A.cover(t), sizes: '512x512', type: 'image/png' }]
+      });
+    } catch (e) {}
+  }
+  if ('mediaSession' in navigator) {
+    try {
+      navigator.mediaSession.setActionHandler('play', A.play);
+      navigator.mediaSession.setActionHandler('pause', A.pause);
+      navigator.mediaSession.setActionHandler('previoustrack', A.prev);
+      navigator.mediaSession.setActionHandler('nexttrack', A.next);
+    } catch (e) {}
+  }
+
+  A.arm = function () {
+    var evs = ['pointerdown', 'keydown', 'touchend'];
+    function go() {
+      evs.forEach(function (e) { removeEventListener(e, go, true); });
+      if (A.userPaused) return;
+      if (A.playing) wire(); else A.play();
+    }
+    evs.forEach(function (e) { addEventListener(e, go, true); });
+  };
+})();
