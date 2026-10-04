@@ -50,7 +50,9 @@
     bar.addEventListener('pointerdown', function (e) { drag = true; bar.setPointerCapture(e.pointerId); seek(e); });
     bar.addEventListener('pointermove', function (e) { if (drag) seek(e); });
     bar.addEventListener('pointerup', function () { drag = false; });
-   
+    bar.addEventListener('pointercancel', function () { drag = false; });
+
+    // volume
     function paintVol() { vol.style.setProperty('--v', (vol.value * 100) + '%'); }
     vol.value = A.volume();
     paintVol();
