@@ -26,7 +26,7 @@
       if (document.hidden) return;
       if (DW.low && (f++ & 1)) return;
       var S = DW.vis.state, k = DW.react.particles || 0;
-      var boost = 1 + (S.level * 1.5 + S.pulse * 2) * k;
+      var boost = 1 + (S.speed * 1.4 + S.level * 1.2 + S.pulse * 1.5) * k;
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = '#e0c4ff';
       for (var i = 0; i < ps.length; i++) {
