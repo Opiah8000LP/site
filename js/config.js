@@ -2,7 +2,9 @@ window.DW = window.DW || {};
 var DW = window.DW;
 
 DW.siteName = 'DWEEB PRODUCTIONS';
+
 DW.low = matchMedia('(max-width: 700px), (pointer: coarse)').matches;
+
 DW.respectReducedMotion = false;
 if (DW.low) document.documentElement.classList.add('low');
 
@@ -39,4 +41,5 @@ DW.playlist = {
   'music2.mp3': { title: 'DANCE', artist: 'RomancePlanet', album: 'Single / 2024' },
   'music3.mp3': { title: 'JENNI', artist: 'Yung Kage, Softwilly', album: 'Single / 2022' }
 };
-DW.defaultArtist = 'Empty Artist';
+DW.defaultArtist = '';
+
