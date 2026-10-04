@@ -1,10 +1,6 @@
-// visualizer.js -- reads the analyser, finds kicks / hats / tempo, and pushes smooth numbers into the ui.
-// strengths live in js/tuning.js. elements get registered in groups with V.bind (see navigation.js / player.js)
 (function () {
   var DW = window.DW, A = DW.audio;
 
-  // built-in defaults, so the engine works even if tuning.js / config.js are missing or old.
-  // layering: these < DW.react (old config.js blocks) < DW.tuning (js/tuning.js). knobs are explained in tuning.js
   var D = {
     master: 1, sensitivity: 1,
     bands: { bass: [35, 140], mid: [140, 2200], high: [2500, 9000] },
@@ -41,9 +37,8 @@
   var avg = 0, prev = 0, fluxAvg = 0, hAvg = 0, hPrev = 0, lastBeat = 0, lastSnap = 0;
   var peak = 0, snapPk = 0, surge = 0, dir = 1, vx = 0, vy = 0, phase = 0;
   var last = 0, frame = 0, wasOn = false, lastWire = 0;
-  var wx = [0, 0, 0], wh = [1, 1, 1], WBASE = [0.0021, -0.0013, 0.0009]; // idle wave drift, % per ms
+  var wx = [0, 0, 0], wh = [1, 1, 1], WBASE = [0.0021, -0.0013, 0.0009];
 
-  // bind('name', element or [elements], [distance of each one from the selected item])
   V.bind = function (name, els, dist) {
     els = els ? [].concat(els) : [];
     var old = groups[name];
@@ -51,14 +46,14 @@
     groups[name] = { els: els, d: dist || [] };
   };
   V.meter = function (l) { meter = l; };
-  V.waves = function (l) { waves = l; };   // front wave first
+  V.waves = function (l) { waves = l; };
   V.glow = function (e) { glow = e; };
   V.root = function (e) { root = e; };
 
   function setup() {
     an = A.analyser;
     data = new Uint8Array(an.frequencyBinCount);
-    var hz = an.context.sampleRate / an.fftSize; // hz per bin
+    var hz = an.context.sampleRate / an.fftSize;
     function r(b) { return [Math.max(1, Math.round(b[0] / hz)), Math.max(2, Math.round(b[1] / hz))]; }
     rng = { b: r(R.bands.bass), m: r(R.bands.mid), h: r(R.bands.high) };
   }
@@ -69,7 +64,6 @@
     return n ? s / n / 255 : 0;
   }
 
-  // what the pulse looked like `ms` ago, so the beat can travel across a row of icons
   function at(now, ms) {
     var t = now - ms;
     for (var i = hist.length - 1; i >= 0; i--) if (hist[i].t <= t) return hist[i];
@@ -82,7 +76,7 @@
     for (var i = 0; i < g.els.length; i++) {
       var d = g.d[i] || 0, h = d && k.ripple && hist.length ? at(now, d * k.ripple) : cur;
       var a = h.p * (k.kick == null ? 1 : k.kick) + h.s * (k.hat || 0);
-      var sg = (i & 1) ? -1 : 1;                        // neighbours tilt opposite ways
+      var sg = (i & 1) ? -1 : 1;
       var w = Math.sin(phase + i * 0.9) * lvs, c = Math.cos(phase * 0.8 + i * 1.3) * lvs;
       var s = 1 + a * k.scale + lv * k.breathe;
       var x = vx * a * k.shift + c * k.sway * k.shift * 0.5;
@@ -92,8 +86,6 @@
     }
   }
 
-  // waves: they always drift, but run faster with song tempo + loudness + a shove on every kick,
-  // and each layer grows with its own band (front = bass, middle = mids, back = highs)
   function drawWaves(dt, M) {
     var W = R.wave, sp = S.speed * W.speed + surge * W.surge;
     var bands = [S.bass, S.mid, S.high];
@@ -101,7 +93,7 @@
       wx[i] += dt * WBASE[i] * (W.idle + sp * M);
       var tgt = 1 + (bands[i] * 1.4 + S.pulse * (i === 0 ? 0.6 : 0.2)) * W.amp[i] * M;
       wh[i] += (tgt - wh[i]) * 0.35;
-      var x = ((wx[i] % 50) + 50) % 50;                 // the wave repeats every 50% of its width
+      var x = ((wx[i] % 50) + 50) % 50;
       waves[i].style.transform = 'translate3d(' + (-x).toFixed(3) + '%,0,0) scaleY(' + wh[i].toFixed(3) + ')';
     }
   }
@@ -118,15 +110,14 @@
     requestAnimationFrame(tick);
     V.frames++;
     try { step(t); }
-    catch (e) { if (!V.err) { V.err = e.message; console.error('[dweeb] beat engine error:', e); } } // shows up in ?debug
+    catch (e) { if (!V.err) { V.err = e.message; console.error('[dweeb] beat engine error:', e); } }
   }
 
   function step(t) {
-    if (DW.low && (frame++ & 1)) return; // 30fps on phones
+    if (DW.low && (frame++ & 1)) return;
     var dt = Math.min(64, t - last);
     last = t;
 
-    // music is playing but the analyser never got connected? try again (engine woke up late etc)
     if (A.playing && !A.analyser && t - lastWire > 1000) {
       lastWire = t;
       if (A.state() === 'running') A.wire();
@@ -138,49 +129,43 @@
       var b = band(rng.b), m = band(rng.m), h = band(rng.h);
       S.bass = b; S.mid = m; S.high = h;
 
-      // kick, two ways: bass climbs above its own recent average, OR it suddenly jumps (the second one is
-      // what catches kicks in loud dense music where the bass never really drops and the average sits near the top)
       var sens = R.sensitivity || 1, flux = Math.max(0, b - prev);
       var hit = (b > avg * (1 + 0.22 / sens) + 0.02 && flux > 0.012) || flux > Math.max(0.06 / sens, fluxAvg * 2.2);
       if (b > 0.15 && hit && t - lastBeat > 190) {
         var gap = t - lastBeat;
         lastBeat = t;
-        if (gap < 1400) S.interval += (gap - S.interval) * 0.35; // smoothed time between beats
+        if (gap < 1400) S.interval += (gap - S.interval) * 0.35;
         peak = Math.min(1, 0.55 + Math.max(b - avg, flux) * 2.5);
         surge = Math.min(1, surge + 0.6);
-        dir = -dir; // sway left / right every other kick
+        dir = -dir;
         S.beats++;
         var a = S.beats * 2.4;
-        vx = Math.cos(a); vy = Math.sin(a) * 0.7; // push direction changes each beat
+        vx = Math.cos(a); vy = Math.sin(a) * 0.7;
       }
 
-      // hats / snares, same idea on the top band but quicker
       if (h > 0.1 && h > hAvg * 1.4 + 0.03 && h - hPrev > 0.02 && t - lastSnap > 100) {
         lastSnap = t;
         snapPk = Math.min(0.5, 0.25 + (h - hAvg));
       }
 
-      // the "recent average" a kick has to beat: shorter on fast songs, otherwise dense kicks never stand out
       avg += (b - avg) * Math.min(1, dt / Math.max(220, Math.min(900, S.interval * 0.8)));
       fluxAvg += (flux - fluxAvg) * Math.min(1, dt / 400);
       hAvg += (h - hAvg) * Math.min(1, dt / 700);
       prev = b; hPrev = h;
       S.level += ((b + m + h) / 3 - S.level) * 0.15;
-      if (t - lastBeat > 2500) S.interval += (900 - S.interval) * Math.min(1, dt / 2000); // no beats = slow tempo
+      if (t - lastBeat > 2500) S.interval += (900 - S.interval) * Math.min(1, dt / 2000);
     } else {
       S.bass *= 0.9; S.mid *= 0.9; S.high *= 0.9; S.level *= 0.92;
     }
 
-    // fast beats = fast fall back to normal, slow beats = long lazy fall
     var tau = Math.max(110, Math.min(520, S.interval * 0.45));
     peak *= Math.exp(-dt / tau);
     snapPk *= Math.exp(-dt / 130);
     surge *= Math.exp(-dt / 450);
-    if (peak > S.pulse) S.pulse += (peak - S.pulse) * (1 - Math.exp(-dt / 28)); // quick but not instant attack
+    if (peak > S.pulse) S.pulse += (peak - S.pulse) * (1 - Math.exp(-dt / 28));
     else S.pulse = peak;
     S.snap = snapPk;
 
-    // "speed" of the song: tempo from the kick spacing + loudness, smoothed so it never jumps
     var tempo = A.playing ? Math.max(0, Math.min(1.5, (60000 / S.interval - 60) / 100)) : 0;
     S.speed += (tempo * R.speed.tempo + S.level * R.speed.energy - S.speed) * Math.min(1, dt / 600);
 
@@ -194,7 +179,7 @@
     if (!on && !wasOn) { drawMeter(); return; }
     wasOn = on;
 
-    phase += dt * (0.0016 + S.speed * 0.0045); // sway runs faster on faster songs
+    phase += dt * (0.0016 + S.speed * 0.0045);
     var cur = { t: t, p: p, s: sn };
     hist.push(cur);
     if (hist.length > 48) hist.shift();
