@@ -71,6 +71,19 @@
   A.pause = function () { A.userPaused = true; want = false; el.pause(); };
   A.toggle = function () { if (el.paused) A.play(); else A.pause(); };
 
+  A.unlock = function () {
+    wire();
+    if (!el.paused) return;
+    var m = el.muted;
+    el.muted = true;
+    var p = el.play();
+    if (p && p.then) p.then(function () {
+      if (!want) { el.pause(); el.currentTime = 0; }
+      el.muted = m;
+    }).catch(function () { el.muted = m; });
+    else el.muted = m;
+  };
+
   A.load = function (i, go) {
     var n = DW.tracks.length;
     if (!n) return;
