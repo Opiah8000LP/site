@@ -13,7 +13,7 @@
     var time = $('pl-time'), fill = $('pl-fill'), bar = $('pl-bar'), list = $('tracklist'), vol = $('pl-vol');
 
     if (!DW.tracks.length) { box.hidden = true; return; }
-n
+
     function tap(id, fn) {
       var b = $(id);
       b.addEventListener('click', function () { fn(); b.blur(); });
@@ -61,7 +61,7 @@ n
     cover.addEventListener('error', function () {
       if (cover.dataset.f) return;
       cover.dataset.f = '1';
-      cover.src = 'covers/default.png';
+      cover.src = DW.tile('dw', true);
     });
 
     A.on('track', function (t) {
