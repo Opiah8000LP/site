@@ -33,10 +33,16 @@ DW.menu = [
   } }
 ];
 
-DW.tracks = [
-  { file: 'youcantlovealone.mp3', title: "You Can't Love Alone!" },
-  { file: 'demo-beat.mp3', title: 'demo beat (delete me)' }
-];
+DW.intro = { src: 'video/intro.mp4', gate: true, skip: true };
+
+DW.playlist = {
+  'youcantlovealone.mp3': "You Can't Love Alone!",
+  'music1.mp3': 'JAMS!'
+};
+DW.tracks = Object.keys(DW.playlist).map(function (f) {
+  var v = DW.playlist[f], o = typeof v === 'string' ? { title: v } : v;
+  return { file: /\./.test(f) ? f : f + '.mp3', title: o.title || f, artist: o.artist };
+});
 
 DW.react = {
   master: 1,
