@@ -1,18 +1,25 @@
 (function () {
   var DW = window.DW, R = DW.react, A = DW.audio;
   var V = (DW.vis = {});
-  var S = (V.state = { pulse: 0, snap: 0, level: 0, bass: 0, mid: 0, high: 0, beats: 0, interval: 500 });
+  var S = (V.state = { pulse: 0, snap: 0, level: 0, bass: 0, mid: 0, high: 0, beats: 0, interval: 500, speed: 0 });
 
-  var els = {}, meter = [], data = null, an = null, rng = null;
-  var avg = 0, prev = 0, hAvg = 0, hPrev = 0, lastBeat = 0, lastSnap = 0;
-  var peak = 0, snapPk = 0, dir = 1, vx = 0, vy = 0;
+  var groups = {}, meter = [], waves = [], glow = null, root = null;
+  var data = null, an = null, rng = null, hist = [];
+  var avg = 0, prev = 0, fluxAvg = 0, hAvg = 0, hPrev = 0, lastBeat = 0, lastSnap = 0;
+  var peak = 0, snapPk = 0, surge = 0, dir = 1, vx = 0, vy = 0, phase = 0;
   var last = 0, frame = 0, wasOn = false;
+  var wx = [0, 0, 0], wh = [1, 1, 1], WBASE = [0.0021, -0.0013, 0.0009];
 
-  V.bind = function (name, el) {
-    if (els[name] && els[name] !== el) els[name].style.transform = '';
-    els[name] = el;
+  V.bind = function (name, els, dist) {
+    els = els ? [].concat(els) : [];
+    var old = groups[name];
+    if (old) old.els.forEach(function (e) { if (els.indexOf(e) < 0) e.style.transform = ''; });
+    groups[name] = { els: els, d: dist || [] };
   };
-  V.meter = function (list) { meter = list; };
+  V.meter = function (l) { meter = l; };
+  V.waves = function (l) { waves = l; };
+  V.glow = function (e) { glow = e; };
+  V.root = function (e) { root = e; };
 
   function setup() {
     an = A.analyser;
@@ -28,13 +35,38 @@
     return n ? s / n / 255 : 0;
   }
 
-  function put(name, p, lv) {
-    var el = els[name];
-    if (!el) return;
-    var k = R[name];
-    var s = 1 + p * k.scale + lv * k.breathe;
-    el.style.transform = 'translate3d(' + (vx * p * k.shift).toFixed(2) + 'px,' + (vy * p * k.shift).toFixed(2) + 'px,0) rotate(' +
-      (dir * p * k.rot).toFixed(2) + 'deg) scale(' + s.toFixed(4) + ')';
+  function at(now, ms) {
+    var t = now - ms;
+    for (var i = hist.length - 1; i >= 0; i--) if (hist[i].t <= t) return hist[i];
+    return hist[0];
+  }
+
+  function put(name, cur, lv, lvs, now) {
+    var g = groups[name], k = R[name];
+    if (!g || !k) return;
+    for (var i = 0; i < g.els.length; i++) {
+      var d = g.d[i] || 0, h = d && k.ripple && hist.length ? at(now, d * k.ripple) : cur;
+      var a = h.p * (k.kick == null ? 1 : k.kick) + h.s * (k.hat || 0);
+      var sg = (i & 1) ? -1 : 1;
+      var w = Math.sin(phase + i * 0.9) * lvs, c = Math.cos(phase * 0.8 + i * 1.3) * lvs;
+      var s = 1 + a * k.scale + lv * k.breathe;
+      var x = vx * a * k.shift + c * k.sway * k.shift * 0.5;
+      var y = vy * a * k.shift + w * k.sway * k.shift * 0.5;
+      var r = dir * sg * a * k.rot + w * k.sway * k.rot * 0.4;
+      g.els[i].style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) rotate(' + r.toFixed(2) + 'deg) scale(' + s.toFixed(4) + ')';
+    }
+  }
+
+  function drawWaves(dt, M) {
+    var W = R.wave, sp = S.speed * W.speed + surge * W.surge;
+    var bands = [S.bass, S.mid, S.high];
+    for (var i = 0; i < waves.length; i++) {
+      wx[i] += dt * WBASE[i] * (W.idle + sp * M);
+      var tgt = 1 + (bands[i] * 1.4 + S.pulse * (i === 0 ? 0.6 : 0.2)) * W.amp[i] * M;
+      wh[i] += (tgt - wh[i]) * 0.35;
+      var x = ((wx[i] % 50) + 50) % 50;
+      waves[i].style.transform = 'translate3d(' + (-x).toFixed(3) + '%,0,0) scaleY(' + wh[i].toFixed(3) + ')';
+    }
   }
 
   function drawMeter() {
@@ -57,12 +89,14 @@
       var b = band(rng.b), m = band(rng.m), h = band(rng.h);
       S.bass = b; S.mid = m; S.high = h;
 
-      var sens = R.sensitivity || 1;
-      if (b > 0.15 && b > avg * (1 + 0.22 / sens) + 0.02 && b - prev > 0.012 && t - lastBeat > 190) {
+      var sens = R.sensitivity || 1, flux = Math.max(0, b - prev);
+      var hit = (b > avg * (1 + 0.22 / sens) + 0.02 && flux > 0.012) || flux > Math.max(0.06 / sens, fluxAvg * 2.2);
+      if (b > 0.15 && hit && t - lastBeat > 190) {
         var gap = t - lastBeat;
         lastBeat = t;
         if (gap < 1400) S.interval += (gap - S.interval) * 0.35;
-        peak = Math.min(1, 0.55 + (b - avg) * 2.5);
+        peak = Math.min(1, 0.55 + Math.max(b - avg, flux) * 2.5);
+        surge = Math.min(1, surge + 0.6);
         dir = -dir;
         S.beats++;
         var a = S.beats * 2.4;
@@ -74,10 +108,12 @@
         snapPk = Math.min(0.5, 0.25 + (h - hAvg));
       }
 
-      avg += (b - avg) * Math.min(1, dt / 900);
+      avg += (b - avg) * Math.min(1, dt / Math.max(220, Math.min(900, S.interval * 0.8)));
+      fluxAvg += (flux - fluxAvg) * Math.min(1, dt / 400);
       hAvg += (h - hAvg) * Math.min(1, dt / 700);
       prev = b; hPrev = h;
       S.level += ((b + m + h) / 3 - S.level) * 0.15;
+      if (t - lastBeat > 2500) S.interval += (900 - S.interval) * Math.min(1, dt / 2000);
     } else {
       S.bass *= 0.9; S.mid *= 0.9; S.high *= 0.9; S.level *= 0.92;
     }
@@ -85,26 +121,35 @@
     var tau = Math.max(110, Math.min(520, S.interval * 0.45));
     peak *= Math.exp(-dt / tau);
     snapPk *= Math.exp(-dt / 130);
+    surge *= Math.exp(-dt / 450);
     if (peak > S.pulse) S.pulse += (peak - S.pulse) * (1 - Math.exp(-dt / 28));
     else S.pulse = peak;
     S.snap = snapPk;
 
+    var tempo = A.playing ? Math.max(0, Math.min(1.5, (60000 / S.interval - 60) / 100)) : 0;
+    S.speed += (tempo * R.speed.tempo + S.level * R.speed.energy - S.speed) * Math.min(1, dt / 600);
+
     var M = R.master;
-    var p = S.pulse * M, sn = S.snap * M, lv = S.level * M;
+    var p = S.pulse * M, sn = S.snap * M, lv = S.level * M, lvs = Math.min(1, S.level * 3) * M;
+
+    drawWaves(dt, M);
+    if (glow) glow.style.opacity = (R.glow.base + p * R.glow.pulse + lv * 0.15).toFixed(3);
+
     var on = p + sn + lv > 0.002;
     if (!on && !wasOn) { drawMeter(); return; }
     wasOn = on;
 
-    put('icon', p, lv);
-    put('sub', p * 0.6 + sn, lv);
-    put('cover', p, lv);
-    put('bg', p, lv);
-    if (els.glow) els.glow.style.opacity = (R.glow.base + p * R.glow.pulse + lv * 0.15).toFixed(3);
+    phase += dt * (0.0016 + S.speed * 0.0045);
+    var cur = { t: t, p: p, s: sn };
+    hist.push(cur);
+    if (hist.length > 48) hist.shift();
+    for (var n in groups) put(n, cur, lv, lvs, t);
+    if (root) root.style.setProperty('--p', p.toFixed(3));
     drawMeter();
   }
 
   V.start = function () {
-    if (DW.reduce) R.master = 0;
+    if (DW.reduce) { R.master = 0; R.wave.idle = 0; }
     requestAnimationFrame(tick);
   };
 })();
