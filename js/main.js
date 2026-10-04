@@ -14,16 +14,40 @@
     setInterval(clock, 15000);
   });
 
+  safe('eyes', function () {
+    var e = $('eyes');
+    function fix() { if (!e.dataset.f) { e.dataset.f = '1'; e.src = DW.eyes; } }
+    e.addEventListener('error', fix);
+    if (e.complete && e.naturalWidth === 0) fix();
+  });
+
   safe('visualizer', function () {
-    DW.vis.bind('glow', $('glow'));
-    DW.vis.bind('bg', $('waves'));
-    DW.vis.meter([].slice.call($('meter').children));
-    DW.vis.start();
+    var V = DW.vis;
+    V.root($('app'));
+    V.glow($('glow'));
+    V.waves(['.w1', '.w2', '.w3'].map(function (s) { return document.querySelector(s); }));
+    V.meter([].slice.call($('meter').children));
+    V.bind('top', [$('sysname'), $('views-wrap'), $('clock')], [0, 1, 2]);
+    V.start();
   });
   safe('menu', function () { DW.nav.build(); DW.nav.bind(); });
   safe('player', function () { DW.player.init(); });
   safe('audio', function () { DW.audio.load(0, false); });
   safe('particles', function () { DW.particles.start(); });
+
+  safe('debug', function () {
+    if (!/[?&]debug/.test(location.search)) return;
+    var d = document.createElement('pre');
+    d.id = 'dbg';
+    document.body.appendChild(d);
+    setInterval(function () {
+      var S = DW.vis.state, A = DW.audio, f = function (n) { return n.toFixed(2); };
+      d.textContent = 'playing  ' + A.playing + '\nengine   ' + A.state() + '\nanalyser ' + !!A.analyser +
+        '\nbass ' + f(S.bass) + '  mid ' + f(S.mid) + '  high ' + f(S.high) +
+        '\nbeats ' + S.beats + '  bpm ' + Math.round(60000 / S.interval) + '  speed ' + f(S.speed) +
+        '\nreduced-motion ' + (DW.reduce ? 'ON' : 'off') + '  low-power ' + DW.low + '  master ' + DW.react.master;
+    }, 250);
+  });
 
   var shown = false;
   function reveal() {
