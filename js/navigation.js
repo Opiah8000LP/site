@@ -10,7 +10,7 @@
     return e;
   }
 
-  function img(id) {
+  function img(id, big) {
     var i = new Image();
     i.src = 'icons/' + id + '.png';
     i.alt = '';
@@ -19,7 +19,7 @@
     i.addEventListener('error', function () {
       if (i.dataset.f) return;
       i.dataset.f = '1';
-      i.src = 'icons/_default.png';
+      i.src = DW.tile(id, big);
     });
     return i;
   }
@@ -33,7 +33,6 @@
     tt = setTimeout(function () { t.classList.remove('show'); }, 2300);
   };
 
-  // only let real web links through (no javascript: stuff)
   function safe(u) {
     if (!u) return '';
     try {
@@ -49,7 +48,7 @@
       cat.style.setProperty('--k', k);
 
       var ico = el('div', 'cat-ico'), fl = el('div', 'fl');
-      fl.appendChild(img(c.id));
+      fl.appendChild(img(c.id, true));
       ico.appendChild(fl);
 
       var subs = el('div', 'subs'), list = [];
