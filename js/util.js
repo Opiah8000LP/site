@@ -1,14 +1,41 @@
 (function () {
   var DW = window.DW;
 
+  DW.reduce = !!DW.respectReducedMotion && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (DW.reduce) document.documentElement.classList.add('reduce');
+
   DW.tile = function (label, big) {
     var t = String(label || '?').slice(0, 2).toUpperCase().replace(/[^A-Z0-9?]/g, '?');
     var a = big ? '#be8cff' : '#e1aaff', b = big ? '#6028c8' : '#8c3ce6';
-    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" shape-rendering="crispEdges">' +
       '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + a + '"/><stop offset="1" stop-color="' + b + '"/></linearGradient></defs>' +
-      '<rect x="8" y="8" width="84" height="84" rx="22" fill="url(#g)"/>' +
-      '<rect x="14" y="12" width="72" height="34" rx="18" fill="#fff" opacity=".18"/>' +
-      '<text x="50" y="62" font-family="Arial,sans-serif" font-weight="700" font-size="34" text-anchor="middle" fill="#fff">' + t + '</text></svg>';
+      '<rect width="100" height="100" fill="#12042b"/><rect x="4" y="4" width="92" height="92" fill="url(#g)"/>' +
+      '<rect x="4" y="4" width="92" height="42" fill="#fff" opacity=".16"/>' +
+      '<path d="M4 4H96V8H8V96H4Z" fill="#fff" opacity=".55"/><path d="M96 96H4V92H92V4H96Z" fill="#12042b" opacity=".45"/>' +
+      '<text x="50" y="63" font-family="Tahoma,Verdana,Arial,sans-serif" font-weight="700" font-size="34" text-anchor="middle" fill="#12042b" opacity=".6" dx="1.5" dy="1.5">' + t + '</text>' +
+      '<text x="50" y="63" font-family="Tahoma,Verdana,Arial,sans-serif" font-weight="700" font-size="34" text-anchor="middle" fill="#fff">' + t + '</text></svg>';
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  };
+
+  DW.eyes = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 12" shape-rendering="crispEdges">' +
+    '<rect x="1" y="2" width="10" height="8" fill="#12042b"/><rect x="2" y="3" width="8" height="6" fill="#fff"/><rect x="5" y="4" width="3" height="4" fill="#7a35ff"/>' +
+    '<rect x="13" y="2" width="10" height="8" fill="#12042b"/><rect x="14" y="3" width="8" height="6" fill="#fff"/><rect x="17" y="4" width="3" height="4" fill="#7a35ff"/></svg>');
+
+  if (DW.playlist) {
+    DW.tracks = Object.keys(DW.playlist).map(function (f) {
+      var v = DW.playlist[f], o = typeof v === 'string' ? { title: v } : (v || {});
+      return {
+        file: /\./.test(f) ? f : f + '.mp3',
+        title: o.title || f.replace(/\.[^.]+$/, ''),
+        artist: o.artist,
+        album: o.album
+      };
+    });
+  }
+  DW.tracks = DW.tracks || [];
+
+  DW.byline = function (t) {
+    return [t.artist || DW.defaultArtist || '', t.album || ''].filter(Boolean).join(' - ');
   };
 })();
