@@ -2,6 +2,7 @@
   var DW = window.DW, A = (DW.audio = {});
   var el = new Audio(), ctx, src, an, gain;
   var vol = 0.8, idx = 0, loopOne = false, errs = 0, want = false, subs = {};
+  var blobs = {}, tried = {};
 
   A.el = el;
   A.playing = false;
@@ -60,12 +61,16 @@
     });
   }
   A.wire = wire;
+  A.state = function () { return ctx ? ctx.state : 'none'; };
 
   A.play = function () {
     A.userPaused = false;
     want = true;
     return wire().then(function () { return el.play(); }).catch(function (e) {
-      emit(e && e.name === 'NotAllowedError' ? 'blocked' : 'error', e);
+      var n = e && e.name;
+      if (n === 'NotAllowedError') emit('blocked', e);
+      else if (n === 'NotSupportedError') broke();
+      else if (n !== 'AbortError') console.warn('[dweeb] play failed', e);
     });
   };
   A.pause = function () { A.userPaused = true; want = false; el.pause(); };
@@ -89,7 +94,7 @@
     if (!n) return;
     idx = ((i % n) + n) % n;
     var t = DW.tracks[idx];
-    el.src = 'audio/' + t.file;
+    el.src = blobs[t.file] || 'audio/' + t.file;
     emit('track', t);
     media(t);
     if (go) A.play();
@@ -112,20 +117,68 @@
     if (loopOne) { el.currentTime = 0; el.play(); }
     else A.load(idx + 1, true);
   });
-  el.addEventListener('error', function () {
+  el.addEventListener('error', function () { broke(); });
+
+  function sniff(b) {
+    var s = String.fromCharCode.apply(null, [].slice.call(b, 0, 12));
+    if (s.slice(0, 3) === 'ID3' || (b[0] === 0xFF && (b[1] & 0xE0) === 0xE0)) return 'mp3';
+    if (s.slice(4, 8) === 'ftyp') return 'm4a';
+    if (s.slice(0, 4) === 'RIFF') return 'wav';
+    if (s.slice(0, 4) === 'fLaC') return 'flac';
+    if (s.slice(0, 4) === 'OggS') return 'ogg';
+    if (/^\s*</.test(s)) return 'html';
+    return 'unknown';
+  }
+
+  function why(t) {
+    var f = t.file;
+    if (t.http) return f + ' not found in audio/ (HTTP ' + t.http + '), check the name';
+    if (t.kind === 'html') return 'audio/' + f + ' gives back a web page, not music. wrong name or folder?';
+    if (t.kind && t.kind !== 'mp3') return f + ' is really a ' + t.kind.toUpperCase() + ' file renamed to .mp3. re-export it as a real mp3';
+    return "this browser can't play " + f + '. re-export it as a normal mp3';
+  }
+
+  function fail(t, msg) {
+    if (t.deadAt && Date.now() - t.deadAt < 2000) return;
+    t.deadAt = Date.now();
     errs++;
-    emit('error');
+    console.error('[dweeb] ' + msg);
+    emit('error', msg);
     if (DW.tracks.length > 1 && errs < DW.tracks.length) {
-      setTimeout(function () { A.load(idx + 1, want); }, 300);
+      setTimeout(function () { A.load(idx + 1, want); }, 700);
     }
-  });
+  }
+
+  var busy = {};
+  function broke() {
+    var t = A.current();
+    if (!t || busy[t.file]) return;
+    if (tried[t.file]) return fail(t, why(t));
+    tried[t.file] = busy[t.file] = 1;
+    var mine = idx;
+    fetch('audio/' + t.file)
+      .then(function (r) {
+        if (!r.ok) { t.http = r.status; throw 0; }
+        return r.arrayBuffer();
+      })
+      .then(function (ab) {
+        t.kind = sniff(new Uint8Array(ab, 0, Math.min(12, ab.byteLength)));
+        blobs[t.file] = URL.createObjectURL(new Blob([ab]));
+        busy[t.file] = 0;
+        if (idx !== mine) return;
+        el.src = blobs[t.file];
+        if (want) A.play();
+      })
+      .catch(function () { busy[t.file] = 0; if (idx === mine) fail(t, why(t)); });
+  }
 
   function media(t) {
     if (!('mediaSession' in navigator)) return;
     try {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: t.title,
-        artist: t.artist || DW.siteName,
+        artist: t.artist || DW.defaultArtist || '',
+        album: t.album || '',
         artwork: [{ src: A.cover(t), sizes: '512x512', type: 'image/png' }]
       });
     } catch (e) {}
