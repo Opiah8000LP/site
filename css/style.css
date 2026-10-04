@@ -40,6 +40,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .ns { position: fixed; inset: 0; z-index: 99; display: grid; place-items: center; background: #07020f; color: var(--p3); letter-spacing: .1em; }
 
+#warn { position: fixed; left: 50%; top: 34px; z-index: 120; transform: translateX(-50%); width: min(92vw, 640px); padding: 8px 12px; text-align: center; font: bold 11px/1.5 var(--font); letter-spacing: .05em; color: #fff; background: #8a1030; border: 2px solid; border-color: #ffb0c0 #4a0518 #4a0518 #ffb0c0; box-shadow: 0 0 0 1px #12042b, 3px 3px 0 rgba(0, 0, 0, .5); }
 #dbg { position: fixed; left: 8px; bottom: 8px; z-index: 99; padding: 6px 8px; font: 11px/1.4 var(--mono); color: #e9ffd0; background: rgba(0, 0, 0, .8); border: 1px solid #6f6; pointer-events: none; }
 
 #app {
@@ -117,19 +118,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 #app:not(.on) .cat-ico { translate: 0 30px; opacity: 0; }
 .cat.act .cat-ico { transform: scale(1); }
 
-.cat-ico::before, .sub-ico::before {
-  content: ''; position: absolute; inset: -9px; opacity: 0; transition: opacity .3s;
-  background: rgba(190, 140, 255, .22); border: 1px solid var(--hi);
-  box-shadow: 0 0 0 1px var(--ink), inset 0 0 0 1px rgba(18, 4, 43, .55);
-  transform: scale(calc(1 + var(--p) * .12));
-}
-.sub-ico::before { inset: -5px; }
-.cat.act .cat-ico::before, .sub.sel .sub-ico::before { opacity: 1; }
-
 .fl { width: 100%; height: 100%; position: relative; }
 .cat.act .fl { animation: fl 5s steps(10) infinite; }
 @keyframes fl { 50% { transform: translateY(-4px); } }
-.cat-ico img, .sub-ico img { position: relative; width: 100%; height: 100%; object-fit: contain; display: block; will-change: transform; filter: drop-shadow(2px 2px 0 rgba(10, 2, 30, .7)); }
+.cat-ico img, .sub-ico img { position: relative; width: 100%; height: 100%; object-fit: contain; display: block; will-change: transform; }
 
 .cat-name {
   position: absolute; left: 0; right: 0; top: calc(var(--cico) + 14px); text-align: center;
@@ -301,7 +293,6 @@ input[type=range]::-moz-range-thumb { width: 6px; height: 14px; border: 1px soli
 
 html.low .w2, html.low .w3, html.low #bg::after { display: none; }
 html.low .cat.act .fl { animation: none; }
-html.low .cat-ico img, html.low .sub-ico img { filter: none; }
 html.low #player.playing { box-shadow: 0 0 0 1px var(--ink), 4px 4px 0 rgba(10, 2, 30, .55); }
 
 html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce #gate { animation: none; }
