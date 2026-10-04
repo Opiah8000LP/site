@@ -9,7 +9,7 @@
   }
 
   P.init = function () {
-    var box = $('player'), cover = $('pl-cover'), title = $('pl-title'), artist = $('pl-artist');
+    var box = $('player'), cover = $('pl-cover'), title = $('pl-title'), artist = $('pl-artist'), state = $('pl-state');
     var time = $('pl-time'), fill = $('pl-fill'), bar = $('pl-bar'), list = $('tracklist'), vol = $('pl-vol');
 
     if (!DW.tracks.length) { box.hidden = true; return; }
@@ -32,7 +32,7 @@
     DW.tracks.forEach(function (t, i) {
       var li = document.createElement('li'), b = document.createElement('button');
       b.type = 'button';
-      b.textContent = (i + 1) + '. ' + t.title;
+      b.textContent = (i + 1) + '. ' + t.title + (t.artist ? '  -  ' + t.artist : '');
       b.addEventListener('click', function () { A.load(i, true); list.hidden = true; b.blur(); });
       li.appendChild(b);
       list.appendChild(li);
@@ -50,8 +50,7 @@
     bar.addEventListener('pointerdown', function (e) { drag = true; bar.setPointerCapture(e.pointerId); seek(e); });
     bar.addEventListener('pointermove', function (e) { if (drag) seek(e); });
     bar.addEventListener('pointerup', function () { drag = false; });
-    bar.addEventListener('pointercancel', function () { drag = false; });
-
+   
     function paintVol() { vol.style.setProperty('--v', (vol.value * 100) + '%'); }
     vol.value = A.volume();
     paintVol();
@@ -66,7 +65,8 @@
 
     A.on('track', function (t) {
       title.textContent = t.title;
-      artist.textContent = t.artist || DW.siteName;
+      artist.textContent = DW.byline(t);
+      state.textContent = 'READY';
       cover.dataset.f = '';
       cover.src = A.cover(t);
       fill.style.transform = 'scaleX(0)';
@@ -78,9 +78,10 @@
     });
     A.on('state', function () {
       box.classList.toggle('playing', A.playing);
+      state.textContent = A.playing ? 'PLAYING' : 'PAUSED';
       if (A.playing) {
         box.classList.remove('wait');
-        artist.textContent = A.current().artist || DW.siteName;
+        artist.textContent = DW.byline(A.current());
       }
     });
     A.on('time', function () {
@@ -92,8 +93,13 @@
       box.classList.add('wait');
       artist.textContent = 'tap or press a key for music';
     });
-    A.on('error', function () { DW.toast("couldn't load " + A.current().file); });
+    A.on('error', function (msg) {
+      state.textContent = 'ERROR';
+      DW.toast(typeof msg === 'string' ? msg : "couldn't load " + A.current().file);
+    });
 
     DW.vis.bind('cover', cover);
+    DW.vis.bind('play', $('pl-play'));
+    DW.vis.bind('pbtn', [$('pl-prev'), $('pl-next'), $('pl-loop'), $('pl-list')], [1, 1, 2, 2]);
   };
 })();
