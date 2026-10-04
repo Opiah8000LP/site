@@ -35,6 +35,7 @@ DW.menu = [
 DW.intro = { src: 'video/intro.mp4', gate: true, skip: true };
 
 DW.playlist = {
-  'music1.mp3': { title: 'JAMS!', artist: 'issbrokie', album: 'Single / 2024' }
+  'music1.mp3': { title: 'JAMS!', artist: 'issbrokie', album: 'Single / 2024' },
+  'music2.mp3': { title: 'DANCE', artist: 'RomancePlanet', album: 'DANCE / 2024' }
 };
 DW.defaultArtist = 'Empty Artist';
