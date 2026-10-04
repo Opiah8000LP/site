@@ -66,13 +66,12 @@
       if (!introURL) return finish();
       if (!I.gate) return play(false);
       gate.hidden = false;
+      var evs = ['pointerup', 'touchend', 'click', 'keydown'];
       function go() {
-        removeEventListener('pointerdown', go, true);
-        removeEventListener('keydown', go, true);
+        evs.forEach(function (e) { removeEventListener(e, go, true); });
         play(true);
       }
-      addEventListener('pointerdown', go, true);
-      addEventListener('keydown', go, true);
+      evs.forEach(function (e) { addEventListener(e, go, true); });
     }
 
     function play(gesture) {
