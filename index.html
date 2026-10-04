@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DWEEB PRODUCTIONS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0318">
+<meta name="description" content="dweeb productions. a tiny purple operating system.">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.goatcounter.com; media-src 'self'; connect-src 'self' https://*.goatcounter.com; base-uri 'none'; form-action 'none'">
+<link rel="icon" href="icons/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/guard.js"></script>
+</head>
+<body>
+
+<div id="app">
+
+  <div id="bg">
+    <div id="glow"></div>
+    <div id="waves">
+      <svg class="wave w3" viewBox="0 0 2400 400" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2b8ff" stop-opacity=".18"/><stop offset="1" stop-color="#9b5cff" stop-opacity=".05"/></linearGradient></defs><path fill="url(#g3)" d="M0 200 C300 100 900 300 1200 200 C1500 100 2100 300 2400 200 V400 H0Z"/></svg>
+      <svg class="wave w2" viewBox="0 0 2400 400" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c58cff" stop-opacity=".30"/><stop offset="1" stop-color="#6a2cff" stop-opacity=".10"/></linearGradient></defs><path fill="url(#g2)" d="M0 200 C300 100 900 300 1200 200 C1500 100 2100 300 2400 200 V400 H0Z"/></svg>
+      <svg class="wave w1" viewBox="0 0 2400 400" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a8ff" stop-opacity=".48"/><stop offset="1" stop-color="#ff6bd6" stop-opacity=".16"/></linearGradient></defs><path fill="url(#g1)" d="M0 200 C300 100 900 300 1200 200 C1500 100 2100 300 2400 200 V400 H0Z"/></svg>
+    </div>
+  </div>
+
+  <canvas id="fx"></canvas>
+
+  <header id="top">
+    <div id="sysname">DWEEB<b>//</b>OS <small>v0.1</small></div>
+    <div id="status">
+      <div id="views-wrap" title="visitors"><img id="eyes" src="icons/eyes.png" alt="views"><span id="views">0</span></div>
+      <time id="clock"></time>
+      <div id="meter" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+  </header>
+
+  <main id="xmb"><div id="cats"></div></main>
+
+  <div id="hint">
+    <span class="kb"><b>&lt;</b><b>&gt;</b> category &nbsp; <b>&#9650;</b><b>&#9660;</b> select &nbsp; <b>ENTER</b> open</span>
+    <span class="tc">swipe to move &middot; tap an icon to open</span>
+  </div>
+
+  <section id="player" aria-label="music player">
+    <button id="pl-covbtn" class="cvbtn" type="button" aria-label="track list"><img id="pl-cover" src="covers/default.png" alt=""></button>
+    <div class="info">
+      <div class="ttl"><span id="pl-title">--</span></div>
+      <div class="meta"><span id="pl-artist"></span><span id="pl-time">0:00 / 0:00</span></div>
+      <div id="pl-bar" class="bar" role="slider" aria-label="progress"><i id="pl-fill"></i></div>
+    </div>
+    <div class="ctl">
+      <button id="pl-prev" type="button" aria-label="previous"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 6h2v12H6zM9.5 12L18 18V6z"/></svg></button>
+      <button id="pl-play" type="button" class="big" aria-label="play / pause">
+        <svg class="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+        <svg class="i-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      </button>
+      <button id="pl-next" type="button" aria-label="next"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+      <button id="pl-loop" type="button" aria-label="loop track"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg></button>
+      <button id="pl-list" type="button" aria-label="track list"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h12v2H3z"/></svg></button>
+      <label class="vol">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>
+        <input id="pl-vol" type="range" min="0" max="1" step="0.01" aria-label="volume">
+      </label>
+    </div>
+    <ul id="tracklist" hidden></ul>
+  </section>
+
+  <div id="toast"></div>
+</div>
+
+<div id="boot">
+  <div class="lines"><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i></div>
+  <h1 id="boot-title">DWEEB PRODUCTIONS</h1>
+  <div id="loader">
+    <div class="lico"><i></i><i></i><b></b></div>
+    <div class="lbar"><i id="load-fill"></i></div>
+    <span id="load-txt">LOADING 0%</span>
+  </div>
+</div>
+
+<noscript><p class="ns">this site runs on javascript. turn it on and come back :)</p></noscript>
+
+<script src="js/config.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/visualizer.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/player.js"></script>
+<script src="js/counter.js"></script>
+<script src="js/boot.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
