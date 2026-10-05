@@ -1,6 +1,3 @@
-// splash.js -- the little line under the top bar that always has something to say.
-// it chats on its own, reacts to what you TYPE (even though theres no text box), and sometimes sings the song thats playing.
-// config is DW.splash in config.js
 (function () {
   var DW = window.DW, A = DW.audio, S = (DW.splashUI = {});
   var box, txt, cfg, live = false, gen = 0, timer = 0, holdTimer = 0, typeTimer = 0, lastSaid = '', sing = null;
@@ -10,7 +7,6 @@
     on: true, email: '', boss: 'NickEh30', lines: [], scolds: [], every: [9, 18], singChance: 0.25, mailChance: 0.08
   };
 
-  // ---------- what it can say. {t} = song title, {a} = artist, {n} = visit number ----------
   var CHAT = [
     'no cookies here. promise.',
     'this site has a pulse, check the icons. its my beating heart <3',
@@ -209,7 +205,6 @@
     })();
     return true;
   }
-  // timed lyrics: called on every time update from the audio engine
   function follow() {
     if (!sing || !sing.timed) return;
     var c = A.el.currentTime, rows = sing.timed, k = -1;
