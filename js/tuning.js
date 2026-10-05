@@ -13,9 +13,9 @@ window.DW.tuning = {
   cover:   { scale: 0.08, rot: 2,   shift: 0,   breathe: 0.01,  sway: 0.6, kick: 1,   hat: 0 },
   play:    { scale: 0.10, rot: 0,   shift: 0,   breathe: 0,     sway: 0,   kick: 1,   hat: 0 },
   pbtn:    { scale: 0.08, rot: 0,   shift: 0,   breathe: 0,     sway: 0,   kick: 0,   hat: 1,   ripple: 60 },
+  splash:  { scale: 0.03, rot: 0,   shift: 1.5, breathe: 0.01,  sway: 0.6, kick: 0.8, hat: 0.3 },
 
   speed: { tempo: 1.2, energy: 2 },
-
   wave: { speed: 3, surge: 5, amp: [0.30, 0.22, 0.16], idle: 1 },
 
   glow: { base: 0.45, pulse: 0.4 },
