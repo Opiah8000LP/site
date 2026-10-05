@@ -14,6 +14,7 @@
     cover:   { scale: 0.08, rot: 2,   shift: 0,   breathe: 0.01,  sway: 0.6, kick: 1,   hat: 0 },
     play:    { scale: 0.10, rot: 0,   shift: 0,   breathe: 0,     sway: 0,   kick: 1,   hat: 0 },
     pbtn:    { scale: 0.08, rot: 0,   shift: 0,   breathe: 0,     sway: 0,   kick: 0,   hat: 1,   ripple: 60 },
+    splash:  { scale: 0.03, rot: 0,   shift: 1.5, breathe: 0.01,  sway: 0.6, kick: 0.8, hat: 0.3 },
     speed: { tempo: 1.2, energy: 2 },
     wave: { speed: 3, surge: 5, amp: [0.30, 0.22, 0.16], idle: 1 },
     glow: { base: 0.45, pulse: 0.4 },
@@ -76,7 +77,7 @@
     for (var i = 0; i < g.els.length; i++) {
       var d = g.d[i] || 0, h = d && k.ripple && hist.length ? at(now, d * k.ripple) : cur;
       var a = h.p * (k.kick == null ? 1 : k.kick) + h.s * (k.hat || 0);
-      var sg = (i & 1) ? -1 : 1;
+      var sg = (i & 1) ? -1 : 1;                        // neighbours tilt opposite ways
       var w = Math.sin(phase + i * 0.9) * lvs, c = Math.cos(phase * 0.8 + i * 1.3) * lvs;
       var s = 1 + a * k.scale + lv * k.breathe;
       var x = vx * a * k.shift + c * k.sway * k.shift * 0.5;
