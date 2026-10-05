@@ -4,46 +4,66 @@ var DW = window.DW;
 DW.siteName = 'DWEEB PRODUCTIONS';
 
 DW.low = matchMedia('(max-width: 700px), (pointer: coarse)').matches;
+if (DW.low) document.documentElement.classList.add('low');
 
 DW.respectReducedMotion = false;
-if (DW.low) document.documentElement.classList.add('low');
 
 DW.counter = { code: '', skipKey: 'dweeb-skip' };
 
 DW.menu = [
-  { id: 'identity', subs: {
-    about: '', bio: '', values: '', philosophy: '', personality: '', goals: '', manifesto: ''
-  } },
-  { id: 'work', subs: {
-    projects: '', portfolio: '', art: '', music: '', writing: '', code: '', videos: '', archive: ''
-  } },
-  { id: 'preferences', subs: {
-    favorites: '', tastes: '', likes: '', dislikes: '', stack: '', playlist: '', media: ''
-  } },
-  { id: 'thoughts', subs: {
-    opinions: '', essays: '', notes: '', reviews: '', quotes: '', lore: ''
-  } },
-  { id: 'interests', subs: {
-    games: '', reading: '', ideas: '', music: ''
-  } },
-  { id: 'wants', subs: {
-    wishlist: '', inspiration: ''
-  } },
-  { id: 'info', subs: {
-    faq: '', stats: '', contact: '', colophon: ''
-  } }
+  { id: 'identity', subs: { bio: '', manifesto: '', persona: '' } },
+  { id: 'projects', subs: { portfolio: '', archive: '', stack: '' } },
+  { id: 'gallery',  subs: { art: '', audio: '', clips: '' } },
+  { id: 'writing',  subs: { essays: '', notes: '' } },
+  { id: 'media',    subs: { library: '', games: '', reviews: '' } },
+  { id: 'curation', subs: { favorites: '', playlists: '', inspirations: '' } },
+  { id: 'ideas',    subs: { concepts: '', wishlists: '' } },
+  { id: 'mindset',  subs: { opinions: '', lore: '' } },
+  { id: 'contact',  subs: { 'reach-out': '', faq: '' } },
+  { id: 'locked', label: 'NEXT CATEGORY FINNA BE CRAZY #GATEKEEPING', subs: {} }
 ];
 
 DW.intro = { src: 'video/intro.mp4', gate: true, skip: true };
 
 DW.playlist = {
-  'music1.mp3': { title: 'JAMS!', artist: 'ISSBROKIE', album: 'Single / 2024' },
+  'music1.mp3': {
+    title: 'JAMS!', artist: 'ISSBROKIE', album: 'Single / 2024',
+    lyrics: [
+      "[0:09] Oh yeah, I got the beats and the jams... wait..",
+      "[0:14] I swear ISSBROKIE sings here...",
+      "[0:18] Maybe its an extended version",
+      "[0:40] Nope. Don't think its extended."
+    ]
+  },
   'music2.mp3': { title: 'DANCE', artist: 'RomancePlanet', album: 'Single / 2024' },
   'music3.mp3': { title: 'Plug Me In', artist: 'Lil Soda Boi', album: 'Eco / 2018' },
   'music4.mp3': { title: 'tbh i dont like being social', artist: 'luvlxckdown', album: 'Single / 2020' },
   'music5.mp3': { title: 'Bloody Daisies', artist: 'Yung Kage, Yumi, Soft...', album: 'Single / 2023' },
-  'music6.mp3': { title: 'just sayin (づ￣ ³￣)づ', artist: 'Deko, RJ Pasin', album: 'Nu Genesis / 2023' },
+  'music6.mp3': { title: 'just sayin (づ￣ ³￣)づ', artist: 'Deko, RJ Pasin', album: 'Nu Genesis / 2023',
+                lyrics: [
+                  "[0:21] Gas bacon? What?"
+                  ]  
+                },
   'music7.mp3': { title: 'driving with my eyes closed', artist: 'rouri404, Vaeo', album: 'GORE / 2022' }
 };
-DW.defaultArtist = '';
+DW.defaultArtist = 'Unknown Artist';
 
+DW.splash = {
+  on: true,
+
+  email: '',
+  boss: 'that one guy',
+  lines: [
+    'Did you know?',
+    'Woah look i can speak mom!',
+    'Eat the frog. Now.',
+  ],
+  scolds: [
+    'AY! LANGUAGE BUDDY!',
+    'I saw what you typed.',
+    'Stop swearing or you have to eat your veggies',
+  ],
+  every: [9, 18],
+  singChance: 0.25,
+  mailChance: 0.08
+};
