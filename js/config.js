@@ -39,7 +39,7 @@ DW.intro = { src: 'video/intro.mp4', gate: true, skip: true };
 DW.playlist = {
   'music1.mp3': { title: 'JAMS!', artist: 'ISSBROKIE', album: 'Single / 2024' },
   'music2.mp3': { title: 'DANCE', artist: 'RomancePlanet', album: 'Single / 2024' },
-  'music3.mp3': { title: 'JENNI', artist: 'Yung Kage, Softwilly', album: 'Single / 2022' },
+  'music3.mp3': { title: 'Plug Me In', artist: 'Lil Soda Boi', album: 'Eco / 2018' },
   'music4.mp3': { title: 'tbh i dont like being social', artist: 'luvlxckdown', album: 'Single / 2020' },
   'music5.mp3': { title: 'Bloody Daisies', artist: 'Yung Kage, Yumi, Soft...', album: 'Single / 2023' },
   'music6.mp3': { title: 'just sayin (づ￣ ³￣)づ', artist: 'Deko, RJ Pasin', album: 'Nu Genesis / 2023' },
