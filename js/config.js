@@ -1,7 +1,7 @@
 window.DW = window.DW || {};
 var DW = window.DW;
 
-DW.siteName = 'DWEEB PRODUCTIONS';
+DW.siteName = 'DWEEB RECORDS';
 
 DW.low = matchMedia('(max-width: 700px), (pointer: coarse)').matches;
 if (DW.low) document.documentElement.classList.add('low');
