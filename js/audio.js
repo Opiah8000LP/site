@@ -1,8 +1,8 @@
 (function () {
   var DW = window.DW, A = (DW.audio = {});
   var el = new Audio(), ctx, src, an, gain;
-  var vol = 0.8, idx = 0, loopOne = false, errs = 0, want = false, subs = {};
-  var blobs = {}, tried = {};
+  var vol = 0.8, muted = false, idx = 0, loopOne = false, shuf = false, past = [], errs = 0, want = false, subs = {};
+  var blobs = {}, tried = {}, busy = {};
 
   A.el = el;
   A.playing = false;
@@ -13,6 +13,7 @@
   try {
     var sv = parseFloat(localStorage.getItem('dw-vol'));
     if (sv >= 0 && sv <= 1) vol = sv;
+    shuf = localStorage.getItem('dw-shuf') === '1';
   } catch (e) {}
   el.volume = vol;
 
@@ -23,26 +24,39 @@
   A.index = function () { return idx; };
   A.current = function () { return DW.tracks[idx]; };
   A.loop = function (v) { if (v !== undefined) loopOne = !!v; return loopOne; };
+  A.shuffle = function (v) {
+    if (v !== undefined) {
+      shuf = !!v;
+      past = [];
+      try { localStorage.setItem('dw-shuf', shuf ? '1' : '0'); } catch (e) {}
+      emit('shuffle');
+    }
+    return shuf;
+  };
 
+  function apply() {
+    var v = muted ? 0 : vol;
+    if (gain) gain.gain.value = v; else el.volume = v;
+  }
   A.volume = function (v) {
     if (v === undefined) return vol;
     vol = Math.max(0, Math.min(1, v));
-    if (gain) gain.gain.value = vol; else el.volume = vol;
+    apply();
     try { localStorage.setItem('dw-vol', vol); } catch (e) {}
+    emit('vol');
+  };
+  A.mute = function (v) {
+    if (v === undefined) return muted;
+    muted = !!v;
+    apply();
+    emit('vol');
+    return muted;
   };
 
   function mk() {
     if (ctx) return;
     var AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    ctx = new AC();
-
-    ctx.onstatechange = tryConnect;
-  }
-
-  function tryConnect() {
-    if (!ctx || ctx.state !== 'running') return;
-    try { connect(); } catch (e) { console.warn('no analyser', e); }
+    if (AC) ctx = new AC();
   }
 
   function connect() {
@@ -52,7 +66,7 @@
     an.fftSize = DW.low ? 512 : 1024;
     an.smoothingTimeConstant = 0.35;
     gain = ctx.createGain();
-    gain.gain.value = vol;
+    gain.gain.value = muted ? 0 : vol;
     el.volume = 1;
     src.connect(an); an.connect(gain); gain.connect(ctx.destination);
     A.analyser = an;
@@ -61,10 +75,12 @@
   function wire() {
     mk();
     if (!ctx) return Promise.resolve();
-    tryConnect();
-    if (ctx.state === 'running') return Promise.resolve();
     var wait = new Promise(function (r) { setTimeout(r, 350); });
-    return Promise.race([ctx.resume().catch(function () {}), wait]).then(tryConnect);
+    return Promise.race([ctx.resume().catch(function () {}), wait]).then(function () {
+      if (ctx.state === 'running') {
+        try { connect(); } catch (e) { console.warn('no analyser', e); }
+      }
+    });
   }
   A.wire = wire;
   A.state = function () { return ctx ? ctx.state : 'none'; };
@@ -95,23 +111,45 @@
     else el.muted = m;
   };
 
+  A.saved = function () {
+    try {
+      var f = localStorage.getItem('dw-track');
+      for (var i = 0; i < DW.tracks.length; i++) if (DW.tracks[i].file === f) return i;
+    } catch (e) {}
+    return 0;
+  };
+
   A.load = function (i, go) {
     var n = DW.tracks.length;
     if (!n) return;
     idx = ((i % n) + n) % n;
     var t = DW.tracks[idx];
+    try { localStorage.setItem('dw-track', t.file); } catch (e) {}
     el.src = blobs[t.file] || 'audio/' + t.file;
     emit('track', t);
     media(t);
     if (go) A.play();
   };
-  A.next = function () { A.load(idx + 1, true); };
+  function pick() {
+    var n = DW.tracks.length, j;
+    if (n < 2) return idx;
+    do { j = Math.floor(Math.random() * n); } while (j === idx);
+    return j;
+  }
+  A.next = function () {
+    if (shuf) { past.push(idx); if (past.length > 50) past.shift(); A.load(pick(), true); }
+    else A.load(idx + 1, true);
+  };
   A.prev = function () {
     if (el.currentTime > 3) el.currentTime = 0;
+    else if (shuf && past.length) A.load(past.pop(), true);
     else A.load(idx - 1, true);
   };
   A.seek = function (f) {
     if (isFinite(el.duration)) el.currentTime = Math.max(0, Math.min(1, f)) * el.duration;
+  };
+  A.skip = function (sec) {
+    if (isFinite(el.duration)) el.currentTime = Math.max(0, Math.min(el.duration, el.currentTime + sec));
   };
 
   el.addEventListener('play', function () { A.playing = true; emit('state'); });
@@ -121,7 +159,7 @@
   el.addEventListener('loadedmetadata', function () { emit('time'); });
   el.addEventListener('ended', function () {
     if (loopOne) { el.currentTime = 0; el.play(); }
-    else A.load(idx + 1, true);
+    else A.next();
   });
   el.addEventListener('error', function () { broke(); });
 
@@ -155,7 +193,6 @@
     }
   }
 
-  var busy = {};
   function broke() {
     var t = A.current();
     if (!t || busy[t.file]) return;
@@ -199,13 +236,11 @@
   }
 
   A.arm = function () {
-    var evs = ['pointerup', 'touchend', 'click', 'keydown'], started = false;
+    var evs = ['pointerdown', 'keydown', 'touchend'];
     function go() {
-      if (!started && !A.userPaused && !A.playing) { started = true; A.play(); }
-      else wire();
-      if (A.analyser || !(window.AudioContext || window.webkitAudioContext)) {
-        evs.forEach(function (e) { removeEventListener(e, go, true); });
-      }
+      evs.forEach(function (e) { removeEventListener(e, go, true); });
+      if (A.userPaused) return;
+      if (A.playing) wire(); else A.play();
     }
     evs.forEach(function (e) { addEventListener(e, go, true); });
   };
