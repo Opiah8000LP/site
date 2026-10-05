@@ -8,6 +8,14 @@
     return m + ':' + (x < 10 ? '0' : '') + x;
   }
 
+  P.toggleLoop = function () {
+    var on = A.loop(!A.loop());
+    $('pl-loop').classList.toggle('on', on);
+    DW.toast(on ? 'looping this track' : 'loop off');
+  };
+  P.toggleShuffle = function () { DW.toast(A.shuffle(!A.shuffle()) ? 'shuffle on' : 'shuffle off'); };
+  P.toggleMute = function () { DW.toast(A.mute(!A.mute()) ? 'muted' : 'sound on'); };
+
   P.init = function () {
     var box = $('player'), cover = $('pl-cover'), title = $('pl-title'), artist = $('pl-artist'), state = $('pl-state');
     var time = $('pl-time'), fill = $('pl-fill'), bar = $('pl-bar'), list = $('tracklist'), vol = $('pl-vol');
@@ -21,10 +29,9 @@
     tap('pl-play', A.toggle);
     tap('pl-prev', A.prev);
     tap('pl-next', A.next);
-    tap('pl-loop', function () {
-      $('pl-loop').classList.toggle('on', A.loop(!A.loop()));
-      DW.toast(A.loop() ? 'looping this track' : 'loop off');
-    });
+    tap('pl-loop', P.toggleLoop);
+    tap('pl-shuf', P.toggleShuffle);
+    tap('pl-mute', P.toggleMute);
     function toggleList() { list.hidden = !list.hidden; }
     tap('pl-list', toggleList);
     tap('pl-covbtn', toggleList);
@@ -52,12 +59,20 @@
     bar.addEventListener('pointerup', function () { drag = false; });
     bar.addEventListener('pointercancel', function () { drag = false; });
 
-    // volume
-    function paintVol() { vol.style.setProperty('--v', (vol.value * 100) + '%'); }
-    vol.value = A.volume();
+    function paintVol() {
+      vol.value = A.volume();
+      vol.style.setProperty('--v', (A.volume() * 100) + '%');
+      box.classList.toggle('muted', A.mute());
+    }
     paintVol();
-    vol.addEventListener('input', function () { A.volume(+vol.value); paintVol(); });
+    vol.addEventListener('input', function () { if (A.mute()) A.mute(false); A.volume(+vol.value); });
     vol.addEventListener('change', function () { vol.blur(); });
+    A.on('vol', paintVol);
+
+    $('pl-loop').classList.toggle('on', A.loop());
+    function paintShuf() { $('pl-shuf').classList.toggle('on', A.shuffle()); }
+    paintShuf();
+    A.on('shuffle', paintShuf);
 
     cover.addEventListener('error', function () {
       if (cover.dataset.f) return;
@@ -102,6 +117,6 @@
 
     DW.vis.bind('cover', cover);
     DW.vis.bind('play', $('pl-play'));
-    DW.vis.bind('pbtn', [$('pl-prev'), $('pl-next'), $('pl-loop'), $('pl-list')], [1, 1, 2, 2]);
+    DW.vis.bind('pbtn', [$('pl-prev'), $('pl-next'), $('pl-loop'), $('pl-shuf'), $('pl-list')], [1, 1, 2, 2, 3]);
   };
 })();
