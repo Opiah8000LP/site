@@ -42,7 +42,8 @@ DW.playlist = {
   'music3.mp3': { title: 'JENNI', artist: 'Yung Kage, Softwilly', album: 'Single / 2022' },
   'music4.mp3': { title: 'tbh i dont like being social', artist: 'luvlxckdown', album: 'Single / 2020' },
   'music5.mp3': { title: 'Bloody Daisies', artist: 'Yung Kage, Yumi, Soft...', album: 'Single / 2023' },
-  'music6.mp3': { title: 'just sayin (づ￣ ³￣)づ', artist: 'Deko, RJ Pasin', album: 'Nu Genesis' }
+  'music6.mp3': { title: 'just sayin (づ￣ ³￣)づ', artist: 'Deko, RJ Pasin', album: 'Nu Genesis / 2023' },
+  'music7.mp3': { title: 'driving with my eyes closed', artist: 'rouri404, Vaeo', album: 'GORE / 2022'
 };
 DW.defaultArtist = '';
 
