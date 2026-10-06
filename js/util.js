@@ -1,5 +1,6 @@
 (function () {
   var DW = window.DW;
+  if (!DW) { DW = window.DW = {}; DW.early = true; }
 
   DW.reduce = !!DW.respectReducedMotion && matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (DW.reduce) document.documentElement.classList.add('reduce');
