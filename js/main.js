@@ -16,7 +16,8 @@
     if (!miss.length) return;
     var w = document.createElement('div');
     w.id = 'warn';
-    w.textContent = 'FILES MISSING ON YOUR SITE: ' + miss.join(', ') + ' - upload them, then reload';
+    var er = window.__err || {};
+    w.textContent = 'FILES MISSING OR BROKEN ON YOUR SITE: ' + miss.map(function (f) { return er[f] ? f + ' [' + er[f] + ']' : f; }).join(', ') + ' - upload them again, then reload';
     document.body.appendChild(w);
     setTimeout(function () { w.remove(); }, 40000);
   });
@@ -39,7 +40,7 @@
 
   safe('visualizer', function () {
     var V = DW.vis;
-    V.root($('app'));
+    V.root($('player'));
     V.glow($('glow'));
     V.waves(['.w1', '.w2', '.w3'].map(function (s) { return document.querySelector(s); }));
     V.meter([].slice.call($('meter').children));
