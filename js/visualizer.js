@@ -18,7 +18,8 @@
     speed: { tempo: 1.2, energy: 2 },
     wave: { speed: 3, surge: 5, amp: [0.30, 0.22, 0.16], idle: 1 },
     glow: { base: 0.45, pulse: 0.4 },
-    particles: 1
+    particles: 1,
+    fps: 0
   };
   function merge(a, b) {
     for (var k in b) {
@@ -39,7 +40,7 @@
   var data = null, an = null, rng = null, hist = [];
   var avg = 0, prev = 0, fluxAvg = 0, hAvg = 0, hPrev = 0, lastBeat = 0, lastSnap = 0;
   var peak = 0, snapPk = 0, surge = 0, dir = 1, vx = 0, vy = 0, phase = 0;
-  var last = 0, frame = 0, wasOn = false, lastWire = 0;
+  var last = 0, lastStep = 0, wasOn = false, lastWire = 0;
   var wx = [0, 0, 0], wh = [1, 1, 1], WBASE = [0.0021, -0.0013, 0.0009];
 
   V.bind = function (name, els, dist) {
@@ -112,7 +113,7 @@
     }
   }
 
-  var act = 0, fr = 0, rawLast = 0, ema = 16, calm = 0;
+  var act = 0, rawLast = 0, ema = 16, calm = 0;
   function touch() { act = performance.now(); }
   ['pointerdown', 'pointermove', 'keydown', 'touchstart', 'wheel'].forEach(function (e) {
     addEventListener(e, touch, { passive: true, capture: true });
@@ -143,13 +144,14 @@
     requestAnimationFrame(tick);
     V.frames++;
     watch(t);
-    if (fr++ % V.div()) return;
+    var gap = 1000 / (R.fps || (DW.low ? 30 : 45)) * V.div();
+    if (t - lastStep < gap - 5) return;
+    lastStep = t;
     try { step(t); }
     catch (e) { if (!V.err) { V.err = e.message; console.error('[dweeb] beat engine error:', e); } }
   }
 
   function step(t) {
-    if (DW.low && (frame++ & 1)) return;
     var dt = Math.min(64, t - last);
     last = t;
 
