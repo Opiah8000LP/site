@@ -46,13 +46,32 @@
       }
     }
 
-    if (I.src) {
-      var fv = job(90000);
-      fetch(I.src)
+    var I2 = DW.intro2 || {};
+    function rare() {
+      var c = window.crypto;
+      if (!c || !c.getRandomValues) return false;
+      var q = /[?&]force2=([^&]+)/.exec(location.search);
+      if (q && I2.testKey && decodeURIComponent(q[1]) === I2.testKey) return true;
+      var odds = +I2.odds > 1 ? +I2.odds : 1e9, u = new Uint32Array(2);
+      c.getRandomValues(u);
+      return ((u[0] & 0x1FFFFF) * 4294967296 + u[1]) / 9007199254740992 < 1 / odds;
+    }
+    function grab(src, fv, fallback) {
+      fetch(src)
         .then(function (r) { if (!r.ok) throw 0; return r.blob(); })
         .then(function (bl) { introURL = URL.createObjectURL(bl); })
         .catch(function () {})
-        .then(fv);
+        .then(function () {
+          if (!introURL && fallback) return grab(fallback, fv);
+          fv();
+        });
+    }
+    if (I.src || I2.src) {
+      var fv = job(90000), lucky = rare();
+      try { if (lucky) localStorage.setItem('dw-intro2', String((+localStorage.getItem('dw-intro2') || 0) + 1)); } catch (e) {}
+      if (lucky) grab(I2.src || 'video/intro2.mp4', fv, I.src);
+      else if (I.src) grab(I.src, fv);
+      else fv();
     }
 
     function check() {
@@ -115,7 +134,7 @@
       cb();
       setTimeout(function () {
         b.classList.add('dead');
-        try { vid.pause(); vid.removeAttribute('src'); vid.load(); } catch (e) {}
+        try { vid.pause(); vid.removeAttribute('src'); vid.load(); vid.remove(); } catch (e) {}
         if (introURL) URL.revokeObjectURL(introURL);
       }, 1200);
     }
