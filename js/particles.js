@@ -24,14 +24,16 @@
     function draw(t) {
       requestAnimationFrame(draw);
       if (document.hidden) return;
-      if (DW.low && (f++ & 1)) return;
+      var d = Math.max(DW.vis.div ? DW.vis.div() : 1, DW.low ? 2 : 1);
+      if (f++ % d) return;
       var S = DW.vis.state, k = DW.react.particles || 0;
       var boost = 1 + (S.speed * 1.4 + S.level * 1.2 + S.pulse * 1.5) * k;
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = '#e0c4ff';
-      for (var i = 0; i < ps.length; i++) {
+      var lim = DW.vis.lite ? N >> 1 : N;
+      for (var i = 0; i < lim; i++) {
         var p = ps[i];
-        p.y -= p.v * boost * (DW.low ? 2 : 1);
+        p.y -= p.v * boost * d;
         p.x += Math.sin(t / 1800 + p.ph) * 0.18;
         if (p.y < -10) ps[i] = p = mk(false);
         ctx.globalAlpha = p.a * (0.6 + 0.4 * Math.sin(t / 600 + p.ph));
