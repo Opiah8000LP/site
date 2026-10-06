@@ -9,7 +9,7 @@ self.addEventListener('activate', function (e) {
       .then(function () { return self.clients.claim(); })
   );
 });
-
+// snooping around the code I see, don't worry I won't tell HIM.
 self.addEventListener('fetch', function (e) {
   var r = e.request, u = new URL(r.url);
   if (r.method !== 'GET' || u.origin !== location.origin) return;
