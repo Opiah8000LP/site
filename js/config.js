@@ -48,13 +48,21 @@ DW.playlist = {
   },
   'music4.mp3': { title: 'tbh i dont like being social', artist: 'luvlxckdown', album: 'Single / 2020' },
   'music5.mp3': { title: 'Bloody Daisies', artist: 'Yung Kage, Yumi, Soft...', album: 'Single / 2023' },
-  'music6.mp3': {
-    title: 'just sayin (づ￣ ³￣)づ', artist: 'Deko, RJ Pasin', album: 'Nu Genesis / 2023',
-    lyrics: [
-      "[0:21] Gas bacon? What?"
-    ]
-  },
-  'music7.mp3': { title: 'driving with my eyes closed', artist: 'rouri404, Vaeo', album: 'GORE / 2022' }
+  'music6.mp3': {title: 'just sayin (づ￣ ³￣)づ', artist: 'Deko, RJ Pasin', album: 'Nu Genesis / 2023',
+                 lyrics: [
+                   "[0:21] Gas bacon? What?"
+                 ]
+                },
+  'music7.mp3': { title: 'driving with my eyes closed', artist: 'rouri404, Vaeo', album: 'GORE / 2022' },
+  'music8.mp3': { title: 'Stupid (Can’t run from the urge)', artist: 'underscores', album: 'Wallsocket (Directors Cut) / 2024',
+                 lyrics: [
+                   "[0:14] Stupid, stupid, stupid, girl just"
+                   "[0:17] traveled 'cross the country,"
+                   "[0:18] Just to do exactly what she does at home, uh"
+                   "[0:22] Stupid, stupid, stupid, girl"
+                   "[0:23] is tweaking at the party,"
+                 ]
+                },
 };
 DW.defaultArtist = 'Unknown Artist';
 
