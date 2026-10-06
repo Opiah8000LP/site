@@ -4,6 +4,12 @@ if (window.top !== window.self) {
 }
 
 window.__miss = [];
+window.__err = {};
+addEventListener('error', function (e) {
+  if (!e.filename || !e.message) return;
+  var f = e.filename.replace(/\?.*$/, '').replace(/^.*\/(js\/[^\/]+)$/, '$1');
+  if (!window.__err[f]) window.__err[f] = e.message + ' (line ' + e.lineno + ')';
+});
 addEventListener('error', function (e) {
   var t = e.target;
   if (t && t.tagName === 'SCRIPT') window.__miss.push((t.getAttribute('src') || '').replace(/\?.*$/, ''));
