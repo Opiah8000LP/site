@@ -31,6 +31,8 @@
 
   var V = (DW.vis = {});
   V.frames = 0;
+  V.lite = false;
+  V.fps = 60;
   var S = (V.state = { pulse: 0, snap: 0, level: 0, bass: 0, mid: 0, high: 0, beats: 0, interval: 500, speed: 0 });
 
   var groups = {}, meter = [], waves = [], glow = null, root = null;
@@ -43,7 +45,7 @@
   V.bind = function (name, els, dist) {
     els = els ? [].concat(els) : [];
     var old = groups[name];
-    if (old) old.els.forEach(function (e) { if (els.indexOf(e) < 0) e.style.transform = ''; });
+    if (old) old.els.forEach(function (e) { if (els.indexOf(e) < 0) { e.style.transform = ''; e.__s = ''; } });
     groups[name] = { els: els, d: dist || [] };
   };
   V.meter = function (l) { meter = l; };
@@ -77,13 +79,14 @@
     for (var i = 0; i < g.els.length; i++) {
       var d = g.d[i] || 0, h = d && k.ripple && hist.length ? at(now, d * k.ripple) : cur;
       var a = h.p * (k.kick == null ? 1 : k.kick) + h.s * (k.hat || 0);
-      var sg = (i & 1) ? -1 : 1;                        // neighbours tilt opposite ways
+      var sg = (i & 1) ? -1 : 1;
       var w = Math.sin(phase + i * 0.9) * lvs, c = Math.cos(phase * 0.8 + i * 1.3) * lvs;
       var s = 1 + a * k.scale + lv * k.breathe;
       var x = vx * a * k.shift + c * k.sway * k.shift * 0.5;
       var y = vy * a * k.shift + w * k.sway * k.shift * 0.5;
       var r = dir * sg * a * k.rot + w * k.sway * k.rot * 0.4;
-      g.els[i].style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) rotate(' + r.toFixed(2) + 'deg) scale(' + s.toFixed(4) + ')';
+      var str = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) rotate(' + r.toFixed(2) + 'deg) scale(' + s.toFixed(4) + ')', el = g.els[i];
+      if (el.__s !== str) { el.__s = str; el.style.transform = str; }
     }
   }
 
@@ -95,7 +98,8 @@
       var tgt = 1 + (bands[i] * 1.4 + S.pulse * (i === 0 ? 0.6 : 0.2)) * W.amp[i] * M;
       wh[i] += (tgt - wh[i]) * 0.35;
       var x = ((wx[i] % 50) + 50) % 50;
-      waves[i].style.transform = 'translate3d(' + (-x).toFixed(3) + '%,0,0) scaleY(' + wh[i].toFixed(3) + ')';
+      var ws = 'translate3d(' + (-x).toFixed(3) + '%,0,0) scaleY(' + wh[i].toFixed(3) + ')';
+      if (waves[i].__s !== ws) { waves[i].__s = ws; waves[i].style.transform = ws; }
     }
   }
 
@@ -103,13 +107,43 @@
     if (!meter.length) return;
     var v = [S.bass, S.mid, S.high];
     for (var i = 0; i < 3; i++) {
-      meter[i].style.transform = 'scaleY(' + (0.18 + Math.min(1, v[i] * 1.3) * 0.82).toFixed(2) + ')';
+      var ms = 'scaleY(' + (0.18 + Math.min(1, v[i] * 1.3) * 0.82).toFixed(2) + ')';
+      if (meter[i].__s !== ms) { meter[i].__s = ms; meter[i].style.transform = ms; }
+    }
+  }
+
+  var act = 0, fr = 0, rawLast = 0, ema = 16, calm = 0;
+  function touch() { act = performance.now(); }
+  ['pointerdown', 'pointermove', 'keydown', 'touchstart', 'wheel'].forEach(function (e) {
+    addEventListener(e, touch, { passive: true, capture: true });
+  });
+
+  V.div = function () {
+    var d = 1;
+    if (V.lite) d = 2;
+    if (!document.hasFocus()) d = Math.max(d, 2);
+    if (!A.playing && performance.now() - act > 30000) d = Math.max(d, 4);
+    return d;
+  };
+
+  function watch(t) {
+    var d = t - rawLast;
+    rawLast = t;
+    if (d <= 0 || d > 500) return;
+    ema += (d - ema) * 0.03;
+    V.fps = Math.round(1000 / ema);
+    if (!V.lite && ema > 30 && V.frames > 180) { V.lite = true; calm = 0; document.documentElement.classList.add('lite'); }
+    else if (V.lite) {
+      if (ema < 19) calm++; else calm = 0;
+      if (calm > 900) { V.lite = false; calm = 0; document.documentElement.classList.remove('lite'); }
     }
   }
 
   function tick(t) {
     requestAnimationFrame(tick);
     V.frames++;
+    watch(t);
+    if (fr++ % V.div()) return;
     try { step(t); }
     catch (e) { if (!V.err) { V.err = e.message; console.error('[dweeb] beat engine error:', e); } }
   }
@@ -174,18 +208,24 @@
     var p = S.pulse * M, sn = S.snap * M, lv = S.level * M, lvs = Math.min(1, S.level * 3) * M;
 
     drawWaves(dt, M);
-    if (glow) glow.style.opacity = (R.glow.base + p * R.glow.pulse + lv * 0.15).toFixed(3);
+    if (glow) {
+      var go = (R.glow.base + p * R.glow.pulse + lv * 0.15).toFixed(3);
+      if (glow.__s !== go) { glow.__s = go; glow.style.opacity = go; }
+    }
 
     var on = p + sn + lv > 0.002;
     if (!on && !wasOn) { drawMeter(); return; }
     wasOn = on;
 
-    phase += dt * (0.0016 + S.speed * 0.0045);
+    phase = (phase + dt * (0.0016 + S.speed * 0.0045)) % 31.41592653589793;
     var cur = { t: t, p: p, s: sn };
     hist.push(cur);
     if (hist.length > 48) hist.shift();
     for (var n in groups) put(n, cur, lv, lvs, t);
-    if (root) root.style.setProperty('--p', p.toFixed(3));
+    if (root) {
+      var ps = p.toFixed(3);
+      if (root.__s !== ps) { root.__s = ps; root.style.setProperty('--p', ps); }
+    }
     drawMeter();
   }
 
