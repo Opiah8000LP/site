@@ -24,7 +24,7 @@
     function draw(t) {
       requestAnimationFrame(draw);
       if (document.hidden) return;
-      var d = Math.max(DW.vis.div ? DW.vis.div() : 1, DW.low ? 2 : 1);
+      var d = Math.max(DW.vis.div ? DW.vis.div() : 1, 2);
       if (f++ % d) return;
       var S = DW.vis.state, k = DW.react.particles || 0;
       var boost = 1 + (S.speed * 1.4 + S.level * 1.2 + S.pulse * 1.5) * k;
