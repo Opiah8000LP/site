@@ -62,7 +62,7 @@ DW.playlist = {
                    "[0:22] Stupid, stupid, stupid, girl"
                    "[0:23] is tweaking at the party,"
                  ]
-                },
+                }
 };
 DW.defaultArtist = 'Unknown Artist';
 
