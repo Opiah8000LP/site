@@ -64,7 +64,8 @@
         '\nbass ' + f(S.bass) + '  mid ' + f(S.mid) + '  high ' + f(S.high) +
         '\nbeats ' + S.beats + '  bpm ' + Math.round(60000 / S.interval) + '  speed ' + f(S.speed) +
         '\nreduced-motion ' + (DW.reduce ? 'ON' : 'off') + '  low-power ' + DW.low + '  master ' + (DW.react && DW.react.master) +
-        '\nframes ' + DW.vis.frames + '  engine-error ' + (DW.vis.err || 'none') +
+        '\nframes ' + DW.vis.frames + '  fps ' + DW.vis.fps + '  lite ' + DW.vis.lite + '  engine-error ' + (DW.vis.err || 'none') +
+        '\nheap ' + (performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) + ' MB' : 'n/a') +
         '\nupdate helper ' + (navigator.serviceWorker && navigator.serviceWorker.controller ? 'active' : 'not active (yet)');
     }, 250);
   });
