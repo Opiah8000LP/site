@@ -8,6 +8,8 @@
   safe('missing files', function () {
     var miss = (window.__miss || []).slice();
     if (!window.__miss) miss.push('js/guard.js');
+    if (DW.early) miss.push('js/config.js (it ran AFTER util.js - script order in index.html is wrong, config.js must come first)');
+    else if (!DW.menu) miss.push('js/config.js');
     [['tile', 'util'], ['audio', 'audio'], ['vis', 'visualizer'], ['nav', 'navigation'], ['player', 'player'],
      ['splashUI', 'splash'], ['extras', 'extras'], ['particles', 'particles'], ['boot', 'boot']].forEach(function (p) {
       var f = 'js/' + p[1] + '.js';
