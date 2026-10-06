@@ -78,7 +78,13 @@
     maxd = v >= 0 ? v : 4;
   }
 
+  var raf = 0;
   function layout() {
+    if (raf) return;
+    raf = requestAnimationFrame(function () { raf = 0; paint(); });
+  }
+
+  function paint() {
     cats.forEach(function (c, k) {
       var d = k - ci, ad = Math.abs(d);
       c.el.style.setProperty('--d', d);
@@ -98,10 +104,14 @@
     react();
   }
 
+  var spotT = 0;
   function saveSpot() {
-    var c = cats[ci], s = c.id + (c.empty ? '' : '/' + c.subs[memo[ci]].id);
-    try { localStorage.setItem('dw-spot', s); } catch (e) {}
-    try { history.replaceState(null, '', '#' + s); } catch (e) {}
+    clearTimeout(spotT);
+    spotT = setTimeout(function () {
+      var c = cats[ci], s = c.id + (c.empty ? '' : '/' + c.subs[memo[ci]].id);
+      try { localStorage.setItem('dw-spot', s); } catch (e) {}
+      try { history.replaceState(null, '', '#' + s); } catch (e) {}
+    }, 220);
   }
 
   N.go = function (s) {
@@ -156,6 +166,7 @@
     layout();
     saveSpot();
   };
+
   N.setSub = function (n) {
     n = Math.max(0, Math.min(cats[ci].subs.length - 1, n));
     if (n === memo[ci]) return;
