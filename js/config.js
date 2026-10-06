@@ -36,7 +36,15 @@ DW.playlist = {
     ]
   },
   'music2.mp3': { title: 'DANCE', artist: 'RomancePlanet', album: 'Single / 2024' },
-  'music3.mp3': { title: 'Plug Me In', artist: 'Lil Soda Boi', album: 'Eco / 2018' },
+  'music3.mp3': { title: 'Plug Me In', artist: 'Lil Soda Boi', album: 'Eco / 2018',
+                lyrics: [
+                  "[0:13] I wanna be a 3D ghost in your dream..."
+                  "[0:16] The smell of burning flesh and sweat and chlorine.."
+                  "[0:20] I feel like heavy eyes and beep and smokescreens"
+                  "[0:23] I feel like telling lies and love and morphine"
+                  "[0:27] Hell yeah I love Lil Soda Boi!"
+                ]
+                },
   'music4.mp3': { title: 'tbh i dont like being social', artist: 'luvlxckdown', album: 'Single / 2020' },
   'music5.mp3': { title: 'Bloody Daisies', artist: 'Yung Kage, Yumi, Soft...', album: 'Single / 2023' },
   'music6.mp3': { title: 'just sayin (づ￣ ³￣)づ', artist: 'Deko, RJ Pasin', album: 'Nu Genesis / 2023',
