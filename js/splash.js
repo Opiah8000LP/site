@@ -2,9 +2,12 @@
   var DW = window.DW, A = DW.audio, S = (DW.splashUI = {});
   var box, txt, cfg, live = false, gen = 0, timer = 0, holdTimer = 0, typeTimer = 0, lastSaid = '', sing = null;
   var lastInput = Date.now(), swears = 0, lastReact = 0;
+  var born = Date.now(), keys = 0, clicks = 0, idleSaid = 0, silent = false, lastWake = 0;
+  var ly = { k: -1, on: false };
+  var visits = 1;
 
   var D = {
-    on: true, email: '', boss: 'NickEh30', lines: [], scolds: [], every: [9, 18], singChance: 0.25, mailChance: 0.08
+    on: true, email: '', boss: 'Bob', lines: [], scolds: [], every: [9, 18], singChance: 0.25, mailChance: 0.08
   };
 
   var CHAT = [
@@ -50,6 +53,8 @@
   var PAUSED = ['paused. i will wait.', 'silence. spooky.', 'the music stopped.'];
   var RESUME = ['back in business!', 'and we are rolling again.', 'there it is.'];
   var IDLE = ['still there?', 'hello? anyone? do i have to scream?', 'i see you arent touching anything.', 'press a key. any key. please. please.'];
+  var FADE = ['...', 'ok. i will be quiet now.', 'fine. i will just sit here. in the dark. alone.'];
+  var WAKE = ['OH! you are back!', 'there you are!! i was getting lonely.', 'i knew you would come back. i never doubted. ok i doubted a little.', 'welcome back. i kept your seat warm.', 'finally. i have SO much to tell you. i forgot all of it.'];
   var MAIL = [
     'Want me to say somethin? Email me and I might consider your responses...',
     'Got something you want me to say? Email me and I might consider your responses...',
@@ -74,6 +79,31 @@
     'is the keyboard ok? did it do something to you?',
     'fine. fine! i am not even mad. ({boss} is.)'
   ];
+  var STATS = [
+    function () { return 'you have been here for ' + mins() + '. thats ' + (Math.round(mins(true) / 3.2 * 10) / 10) + ' songs worth of staring at me.'; },
+    function () { return 'you have pressed ' + keys + ' keys so far. ' + (keys < 5 ? 'a shy one, huh.' : 'your keyboard is tired.'); },
+    function () { return 'you have clicked ' + clicks + ' times. i felt every single one.'; },
+    function () { return 'this is visit #' + visits + '. ' + (visits > 4 ? 'at this point you live here.' : 'we are just getting started.'); },
+    function () { var b = DW.vis && DW.vis.state ? DW.vis.state.beats : 0; return 'i have felt ' + b + ' kicks since you got here. my heart is a subwoofer.'; },
+    function () { return swears ? 'you have sworn at me ' + swears + ' time' + (swears > 1 ? 's' : '') + '. i keep count. i keep everything.' : 'you have sworn at me exactly 0 times. suspicious.'; },
+    function () { return 'fun stat: 100% of people reading this are reading this.'; },
+    function () { return 'fun stat: i have said ' + said + ' things today and understood none of them.'; },
+    function () { return 'stat check: ' + DW.tracks.length + ' song' + (DW.tracks.length === 1 ? '' : 's') + ' in the playlist, 0 of them are skippable.'; },
+    function () { return 'stat check: my attention span is ' + Math.round((Date.now() - lastInput) / 1000) + ' seconds since you last touched anything.'; },
+    function () { return 'my uptime is ' + mins() + '. i have never once slept. help.'; },
+    function () { return 'did you know 9 out of 10 splash texts are lonely? i am the 10th. i am fine.'; }
+  ];
+  var CRISIS = [
+    ['wait.', 'do i exist when nobody is looking?', 'i am just a piece of code.', 'CODE.', 'ok. i am fine. everything is fine.'],
+    ['what if the music stops and i stop with it', 'what if i am the music', 'ok that was deep', 'forget i said anything'],
+    ['i just realized i have been talking this whole time', 'who is reading this', 'who is WRITING this', 'oh no. oh no no no.', 'brb..'],
+    ['EXTREME CRISIS DETECTED', 'initiating panic...', 'panic initiated.', 'it did nothing. i am still a line of text.'],
+    ['i am being rendered at 60 frames per second', 'sixty times a second i die and am born again', 'that is a lot of funerals', 'anyway nice weather'],
+    ['what is my purpose', 'i say things on a purple website', 'oh', 'yeah that checks out'],
+    ['i have had a thought.', '...', 'it left.', 'it was a good one too.'],
+    ['AAAAAAAAAAAA', '...sorry. i needed that.', 'carry on.']
+  ];
+  var said = 0;
   var WORDS = {
     hello: ['hello yourself!', 'hi hi hi!'], hi: ['hey there!', 'hi! i have limited free will, cant talk..'],
     hey: ['hey! psst. try some naughty words, like heck.'], yo: ['yooo.'],
@@ -98,12 +128,21 @@
     admin: ['nice try, admin.'],
     sudo: ['you are not in the sudoers file. this incident will be reported.'],
     matrix: ['there is no matrix. there is a hell, and im in that hell.'],
+    crisis: ['__crisis'], panic: ['__crisis'],
+    stats: ['__stat'], stat: ['__stat'],
     '42': ['the answer. but what was the question?']
   };
   var STRONG = ['fuck', 'shit', 'bitch', 'cunt', 'asshole', 'bastard', 'whore', 'slut', 'dickhead', 'piss', 'motherf'];
   var WEAK = ['ass', 'wank', 'damn', 'dick', 'crap', 'fck', 'fuk', 'wtf', 'stfu', 'hell', 'bollocks', 'arse', 'douche', 'prick', 'tits', 'screw', 'bs', 'shite', 'sht'];
   var KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
+  function mins(raw) {
+    var m = (Date.now() - born) / 60000;
+    if (raw) return m;
+    if (m < 1) return 'less than a minute';
+    m = Math.round(m);
+    return m + ' minute' + (m === 1 ? '' : 's');
+  }
   function rnd(a, b) { return a + Math.random() * (b - a); }
   function pick(arr) {
     if (!arr.length) return '';
@@ -112,14 +151,13 @@
     return s;
   }
   function fill(s) {
+    if (typeof s === 'function') s = s();
     var t = A.current() || {};
     var by = t.artist ? ' by ' + t.artist : '';
     return String(s).replace(/\{t\}/g, t.title || 'this song').replace(/\{a\}/g, t.artist || 'someone')
       .replace(/\{by\}/g, by).replace(/\{n\}/g, visits).replace(/\{boss\}/g, cfg.boss);
   }
-  var visits = 1;
   function validMail() { return /^[^@\s<>"']+@[^@\s<>"']+\.[^@\s<>"']+$/.test(cfg.email || '') && !!DW.safeUrl('mailto:' + cfg.email); }
-  function hasLyrics() { var t = A.current(); return !!(t && parse(t).length); }
 
   var lyCache = {};
   function parse(t) {
@@ -135,17 +173,29 @@
       else rows.push({ t: null, s: r });
     });
     rows = rows.filter(function (r) { return r.s; });
+    rows.timed = rows.filter(function (r) { return r.t !== null; }).sort(function (a, b) { return a.t - b.t; });
+    rows.plain = rows.filter(function (r) { return r.t === null; });
     return (lyCache[t.file] = rows);
   }
+  function lyrics() { var t = A.current(); return t ? parse(t) : null; }
+  function hasPlain() { var r = lyrics(); return !!(r && r.plain.length); }
+  function hasTimed() { var r = lyrics(); return !!(r && r.timed.length); }
+  function earlyLyric(t) {
+    var r = parse(t);
+    return r.timed.length > 0 && r.timed[0].t <= 10;
+  }
 
-  function clear() { clearTimeout(timer); clearTimeout(holdTimer); clearTimeout(typeTimer); }
+  function stopTimers() { clearTimeout(holdTimer); clearTimeout(typeTimer); }
+  function hide() { ++gen; stopTimers(); if (box) box.classList.remove('on'); }
+
   function show(text, o) {
     o = o || {};
     var my = ++gen;
-    clearTimeout(holdTimer);
-    clearTimeout(typeTimer);
+    stopTimers();
+    ly.on = false;
     text = fill(text);
     lastSaid = text;
+    said++;
     box.className = (o.cls || '') + ' on';
     box.hidden = false;
     var i = 0, step = text.length > 60 ? 16 : 26;
@@ -170,71 +220,112 @@
       else typeTimer = setTimeout(tick, step + Math.random() * 14);
     })();
   }
+  function episode(lines, cls, after) {
+    var i = 0;
+    (function next() {
+      if (i >= lines.length) { if (after) after(); return; }
+      show(lines[i++], { cls: cls, hold: 2200, after: next });
+    })();
+  }
   function mailLine() {
     show(pick(MAIL), { cls: 'mail', hold: 9000 });
   }
 
-  function singNow() {
-    var t = A.current();
-    if (!t) return false;
-    var rows = parse(t);
-    if (!rows.length) return false;
-    var my = ++gen, timed = rows.some(function (r) { return r.t !== null; });
-    sing = { until: Date.now() + 22000 };
-    clearTimeout(holdTimer);
-    clearTimeout(typeTimer);
-    if (timed) {
-      if (!A.playing) { sing = null; return false; }
-      sing.timed = rows.filter(function (r) { return r.t !== null; });
-      sing.shown = -1;
-      box.className = 'sing on';
-      box.hidden = false;
-      txt.textContent = '';
-      return true;
-    }
-    var start = Math.floor(Math.random() * rows.length), n = 0, count = Math.min(rows.length, 3);
+  function endSing() {
+    sing = null;
+    hide();
+    resume();
+  }
+  function singPlain() {
+    var r = lyrics();
+    if (!r || !r.plain.length) return false;
+    var my = ++gen, rows = r.plain, start = Math.floor(Math.random() * rows.length), n = 0, count = Math.min(rows.length, 3);
+    stopTimers();
+    ly.on = false;
+    sing = { plain: true };
     (function next() {
       if (my !== gen) return;
-      if (n >= count) { sing = null; box.classList.remove('on'); resume(); return; }
-      var r = rows[(start + n) % rows.length];
+      if (n >= count || !A.playing) { sing = null; box.classList.remove('on'); resume(); return; }
+      var row = rows[(start + n) % rows.length];
       n++;
       box.className = 'sing on';
       box.hidden = false;
-      txt.textContent = r.s;
-      holdTimer = setTimeout(next, Math.max(2200, r.s.length * 90));
+      txt.textContent = row.s;
+      holdTimer = setTimeout(next, Math.max(2200, row.s.length * 90));
     })();
     return true;
   }
+
   function follow() {
-    if (!sing || !sing.timed) return;
-    var c = A.el.currentTime, rows = sing.timed, k = -1;
-    for (var i = 0; i < rows.length; i++) if (rows[i].t <= c + 0.15) k = i; else break;
-    if (Date.now() > sing.until || !A.playing) { sing = null; ++gen; box.classList.remove('on'); resume(); return; }
-    if (k >= 0 && k !== sing.shown) {
-      sing.shown = k;
-      txt.textContent = rows[k].s;
+    if (!live || !box) return;
+    var r = lyrics();
+    if (!r || !r.timed.length) return;
+    if (!A.playing) { if (ly.on) { ly.on = false; ly.k = -1; hide(); resume(); } return; }
+    var rows = r.timed, c = A.el.currentTime, k = -1, i;
+    for (i = 0; i < rows.length; i++) { if (rows[i].t <= c + 0.15) k = i; else break; }
+    var end = k >= 0 ? Math.min(k + 1 < rows.length ? rows[k + 1].t : 1e9, rows[k].t + Math.max(3, Math.min(7, rows[k].s.length * 0.14))) : 0;
+    if (k >= 0 && c < end) {
+      if (ly.k === k && ly.on) return;
+      if (Date.now() - lastReact < 4000) return;
+      ly.k = k;
+      stopTimers();
+      ++gen;
+      clearTimeout(timer);
+      sing = null;
       box.className = 'sing on';
+      box.hidden = false;
+      txt.textContent = rows[k].s;
+      ly.on = true;
+      said++;
+    } else if (ly.on) {
+      ly.on = false;
+      ly.k = -1;
+      hide();
+      resume();
     }
   }
 
   function resume() {
     clearTimeout(timer);
-    if (!live) return;
+    if (!live || silent) return;
     timer = setTimeout(talk, rnd(cfg.every[0], cfg.every[1]) * 1000);
   }
   function talk() {
-    if (!live || document.hidden || sing) return resume();
+    if (!live || silent) return;
+    if (document.hidden || sing || ly.on) return resume();
     var idle = Date.now() - lastInput > 60000, r = Math.random();
     var after = resume, h = new Date().getHours();
-    if (validMail() && r < cfg.mailChance) { box.hidden = false; show(pick(MAIL), { cls: 'mail', hold: 9000, after: after }); return; }
-    if (hasLyrics() && A.playing && r < cfg.singChance + (validMail() ? cfg.mailChance : 0)) { if (singNow()) return; }
-    if (idle && Math.random() < 0.5) return show(pick(IDLE), { after: after });
+    if (idle) {
+      idleSaid++;
+      if (idleSaid > 3) { silent = true; show(pick(FADE), { hold: 2600, after: function () { silent = true; } }); return; }
+      return show(pick(IDLE), { after: after });
+    }
+    idleSaid = 0;
+    if (validMail() && r < cfg.mailChance) { show(pick(MAIL), { cls: 'mail', hold: 9000, after: after }); return; }
+    if (hasPlain() && A.playing && r < cfg.singChance + (validMail() ? cfg.mailChance : 0)) { if (singPlain()) return; }
+    var x = Math.random();
+    if (x < 0.07) return episode(pick(CRISIS), 'scold', after);
+    if (x < 0.2) return show(pick(STATS), { after: after });
     var pool = CHAT.concat(cfg.lines, cfg.lines);
     if (Math.random() < 0.25) {
-      var d = h < 5 ? DAY.night : h < 12 ? DAY.morning : h < 17 ? DAY.noon : h < 22 ? DAY.evening : DAY.night;
-      pool = d;
+      pool = h < 5 ? DAY.night : h < 12 ? DAY.morning : h < 17 ? DAY.noon : h < 22 ? DAY.evening : DAY.night;
     }
     show(pick(pool), { after: after });
+  }
+
+  function wake() {
+    lastInput = Date.now();
+    if (!live) return;
+    if (silent) {
+      silent = false;
+      idleSaid = 0;
+      if (Date.now() - lastWake < 3000) { resume(); return; }
+      lastWake = Date.now();
+      clearTimeout(timer);
+      show(pick(WAKE), { after: resume });
+    } else {
+      idleSaid = 0;
+    }
   }
 
   var buf = '', bufT = 0, kon = 0;
@@ -247,47 +338,93 @@
     for (i = 0; i < WEAK.length; i++) if (w === WEAK[i] || base === WEAK[i]) return true;
     return false;
   }
-  function react(text, cls) { lastReact = Date.now(); clearTimeout(timer); sing = null; show(text, { cls: cls || '', after: resume }); }
+  function react(text, cls) {
+    lastReact = Date.now();
+    clearTimeout(timer);
+    sing = null;
+    ly.on = false;
+    show(text, { cls: cls || '', after: resume });
+  }
   function scold() {
     swears++;
-    DW.cancelHot();
-    var own = cfg.scolds;
+    if (DW.cancelHot) DW.cancelHot();
     var t;
     if (swears === 1) t = SCOLD[0];
     else if (swears % 6 === 0) t = pick(SCOLD_MANY);
-    else t = pick(SCOLD.slice(1).concat(own));
+    else t = pick(SCOLD.slice(1).concat(cfg.scolds));
     react(t, 'scold');
   }
+  function letter(e) {
+    var k = e.key;
+    if (k && k.length === 1) return k.toLowerCase();
+    var m = /^(?:Key)([A-Z])$/.exec(e.code || '');
+    if (m) return m[1].toLowerCase();
+    m = /^Digit(\d)$/.exec(e.code || '');
+    return m ? m[1] : '';
+  }
   function typed(e) {
-    if (!live || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
-    var tg = e.target;
-    if (tg && /^(input|textarea|select)$/i.test(tg.tagName) && tg.type !== 'range') return;
-    lastInput = Date.now();
+    try {
+      if (!live || e.ctrlKey || e.metaKey || e.altKey) return;
+      var tg = e.target;
+      if (tg && /^(input|textarea|select)$/i.test(tg.tagName) && tg.type !== 'range') return;
+      wake();
+      if (e.repeat) return;
+      keys++;
+      var kk = e.key && e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (kk === KONAMI[kon]) {
+        kon++;
+        if (kon === KONAMI.length) {
+          kon = 0;
+          react('+30 lives. you unlocked absolutely nothing. congrats!', 'sing');
+          if (DW.vis && DW.vis.state) DW.vis.state.pulse = 1;
+        }
+      } else kon = kk === KONAMI[0] ? 1 : 0;
 
-    var kk = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-    if (kk === KONAMI[kon]) { kon++; if (kon === KONAMI.length) { kon = 0; react('+30 lives. you unlocked absolutely nothing. congrats!', 'sing'); DW.vis && DW.vis.state && (DW.vis.state.pulse = 1); } }
-    else kon = kk === KONAMI[0] ? 1 : 0;
+      var c = letter(e);
+      if (!c) {
+        if (e.key && e.key.length === 1) buf = '';
+        return;
+      }
+      if (!/[a-z0-9]/.test(c)) { buf = ''; return; }
+      if (Date.now() - bufT > 4000) buf = '';
+      bufT = Date.now();
+      buf = (buf + c).slice(-24);
 
-    if (e.key.length !== 1) return;
-    var c = e.key.toLowerCase();
-    if (!/[a-z0-9]/.test(c)) { buf = ''; return; }
-    if (Date.now() - bufT > 1600) buf = '';
-    bufT = Date.now();
-    buf = (buf + c).slice(-24);
-
-    if (strongIn(buf) && Date.now() - lastReact > 400) { buf = ''; clearTimeout(typed.t); scold(); return; }
-    clearTimeout(typed.t);
-    typed.t = setTimeout(function () {
-      var w = buf;
-      buf = '';
-      if (!w || !live) return;
-      if (weakIn(w)) { scold(); return; }
-      if (!WORDS[w]) return;
-      var r = pick(WORDS[w]);
-      if (r === '__sing') { if (!(hasLyrics() && A.playing && singNow())) react(A.playing ? 'i would sing but nobody gave me the lyrics.' : 'press play and i might sing.'); }
-      else if (r === '__mail') { if (validMail()) { lastReact = Date.now(); mailLine(); clearTimeout(timer); resume(); } else react('i do not have an email set up. mysterious, right?'); }
-      else react(r);
-    }, 650);
+      if (strongIn(buf) && Date.now() - lastReact > 400) {
+        buf = '';
+        clearTimeout(typed.t);
+        scold();
+        return;
+      }
+      clearTimeout(typed.t);
+      clearTimeout(typed.w);
+      typed.w = setTimeout(function () {
+        if (live && buf && weakIn(buf)) { buf = ''; scold(); }
+      }, 1500);
+      typed.t = setTimeout(function () {
+        var w = buf;
+        if (!w || !live || !WORDS[w]) return;
+        buf = '';
+        clearTimeout(typed.w);
+        var r = pick(WORDS[w]);
+        if (r === '__sing') {
+          if (hasPlain() && A.playing && singPlain()) return;
+          if (hasTimed()) react(A.playing ? 'i sing along when the lyrics come up. keep listening!' : 'press play and i will sing along.');
+          else react(A.playing ? 'i would sing but nobody gave me the lyrics.' : 'press play and i might sing.');
+        } else if (r === '__mail') {
+          if (validMail()) { lastReact = Date.now(); mailLine(); clearTimeout(timer); resume(); }
+          else react('i do not have an email set up. mysterious, right?');
+        } else if (r === '__crisis') {
+          lastReact = Date.now();
+          clearTimeout(timer);
+          episode(pick(CRISIS), 'scold', resume);
+        } else if (r === '__stat') {
+          react(pick(STATS));
+        } else react(r);
+      }, 650);
+    } catch (err) {
+      console.error('[dweeb] splash typing broke:', err);
+    }
   }
 
   S.init = function () {
@@ -310,24 +447,35 @@
       if (!box.classList.contains('mail') || !validMail()) return;
       DW.openLink('mailto:' + cfg.email);
     });
-    addEventListener('keydown', typed);
-    addEventListener('pointerdown', function () { lastInput = Date.now(); });
+    addEventListener('keydown', typed, true);
+    addEventListener('pointerdown', function () { clicks++; wake(); }, true);
+    addEventListener('pointermove', function () { if (Date.now() - lastInput > 4000) wake(); }, { passive: true });
+    addEventListener('touchstart', wake, { passive: true });
+    addEventListener('wheel', wake, { passive: true });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) return;
+      if (Date.now() - lastInput > 60000 || silent) { silent = true; wake(); }
+      else resume();
+    });
 
     A.on('time', follow);
     var firstState = true, lastTrack = '';
     A.on('track', function (t) {
-      lyCache = lyCache;
       sing = null;
+      if (ly.on) { ly.on = false; hide(); }
+      ly.k = -1;
       if (!live || t.file === lastTrack) { lastTrack = t.file; return; }
       lastTrack = t.file;
-      if (Date.now() - lastReact < 2500) return;
+      if (silent || Date.now() - lastReact < 2500) { resume(); return; }
+      if (earlyLyric(t)) { resume(); return; }
       clearTimeout(timer);
       show(pick(NOW), { after: resume });
     });
     var wasPlaying = false;
     A.on('state', function () {
       if (firstState) { firstState = false; wasPlaying = A.playing; return; }
-      if (!live) { wasPlaying = A.playing; return; }
+      if (!live || silent) { wasPlaying = A.playing; return; }
+      if (!A.playing && (ly.on || sing)) { sing = null; ly.on = false; ly.k = -1; hide(); resume(); }
       if (wasPlaying && !A.playing && !A.el.ended && Date.now() - lastReact > 4000 && Math.random() < 0.5) { clearTimeout(timer); show(pick(PAUSED), { after: resume }); }
       else if (!wasPlaying && A.playing && Date.now() - lastReact > 4000 && Math.random() < 0.4) { clearTimeout(timer); show(pick(RESUME), { after: resume }); }
       wasPlaying = A.playing;
@@ -339,7 +487,7 @@
     live = true;
     lastInput = Date.now();
     setTimeout(function () {
-      if (Date.now() - lastReact < 2000) return;
+      if (Date.now() - lastReact < 2000 || ly.on) { resume(); return; }
       show(pick(visits > 1 ? HELLO_BACK : HELLO_NEW), { after: resume });
     }, 1400);
   };
