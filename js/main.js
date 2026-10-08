@@ -11,7 +11,7 @@
     if (DW.early) miss.push('js/config.js' + ((window.__err || {})['js/config.js'] ? '' : ' (did not run before util.js - check the script order in index.html)'));
     else if (!DW.menu) miss.push('js/config.js');
     [['tile', 'util'], ['audio', 'audio'], ['vis', 'visualizer'], ['nav', 'navigation'], ['player', 'player'],
-     ['splashUI', 'splash'], ['extras', 'extras'], ['particles', 'particles'], ['boot', 'boot']].forEach(function (p) {
+     ['splashUI', 'splash'], ['store', 'store'], ['season', 'seasons'], ['trophy', 'trophies'], ['games', 'games'], ['pet', 'pet'], ['extras', 'extras'], ['particles', 'particles'], ['boot', 'boot']].forEach(function (p) {
       var f = 'js/' + p[1] + '.js';
       if (!DW[p[0]] && miss.indexOf(f) < 0) miss.push(f);
     });
@@ -53,6 +53,10 @@
   safe('player', function () { DW.player.init(); });
   safe('splash', function () { DW.splashUI.init(); });
   safe('extras', function () { DW.extras.init(); });
+  safe('seasons', function () { DW.season.init(); });
+  safe('trophies', function () { DW.trophy.init(); });
+  safe('games', function () { DW.games.init(); });
+  safe('pet', function () { DW.pet.init(); });
   safe('audio', function () { DW.audio.load(DW.audio.saved(), false); });
   safe('particles', function () { DW.particles.start(); });
 
@@ -98,4 +102,5 @@
   try { DW.boot(reveal); }
   catch (e) { console.error('[dweeb] boot broke:', e); bail(); }
 })();
+
 
