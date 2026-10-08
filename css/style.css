@@ -43,8 +43,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 #warn { position: fixed; left: 50%; top: 34px; z-index: 120; transform: translateX(-50%); width: min(92vw, 640px); padding: 8px 12px; text-align: center; font: bold 11px/1.5 var(--font); letter-spacing: .05em; color: #fff; background: #8a1030; border: 2px solid; border-color: #ffb0c0 #4a0518 #4a0518 #ffb0c0; box-shadow: 0 0 0 1px #12042b, 3px 3px 0 rgba(0, 0, 0, .5); }
 #dbg { position: fixed; left: 8px; bottom: 8px; z-index: 99; padding: 6px 8px; font: 11px/1.4 var(--mono); color: #e9ffd0; background: rgba(0, 0, 0, .8); border: 1px solid #6f6; pointer-events: none; }
 
-/* ---------- app shell + background ---------- */
-
 #app {
   position: fixed; inset: 0; overflow: hidden;
   opacity: 0; transition: opacity 1.4s ease;
@@ -52,7 +50,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 #app.on { opacity: 1; }
 
-/* faint scanlines over the background only (under the menu) for the crt crunch */
 #app::after {
   content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .3;
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .35) 0 1px, transparent 1px 3px);
@@ -69,7 +66,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   opacity: .45; will-change: opacity;
 }
 #waves { position: absolute; inset: 0; }
-/* js moves + stretches these every frame (speed follows the song) */
 .wave { position: absolute; left: 0; bottom: 0; width: 200%; height: 52%; transform-origin: 50% 100%; will-change: transform; }
 .w2 { height: 46%; bottom: -3%; }
 .w3 { height: 60%; bottom: -6%; }
@@ -78,8 +74,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .w3 .crest { stroke-opacity: .2; }
 
 #fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-
-/* ---------- top status bar ---------- */
 
 #top {
   position: absolute; top: 0; left: 0; right: 0; z-index: 5;
@@ -103,13 +97,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 #status > #meter { align-items: flex-end; gap: 2px; padding: 5px 10px; }
 #meter i { width: 4px; height: 100%; background: linear-gradient(#fff, #c58cff); transform-origin: 50% 100%; transform: scaleY(.18); }
 
-/* buttons js adds to the top bar (?) */
 #status > .tbtn { gap: 6px; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: inherit; color: #fff; text-shadow: inherit; }
 .tbtn img { height: 14px; width: auto; display: block; image-rendering: pixelated; }
 .tbtn:hover, .tbtn:focus-visible { background: linear-gradient(#cfa8ff 0 50%, #9250ff 50% 100%); outline: none; }
 .tbtn:active { background: linear-gradient(#6a28d8 0 50%, #5a1fd0 50% 100%); box-shadow: inset 1px 1px 0 rgba(0, 0, 0, .35); }
-
-/* ---------- the menu ---------- */
 
 #xmb { position: absolute; inset: 0; z-index: 2; }
 #cats { position: absolute; left: var(--ax); top: var(--ry); width: var(--cw); height: 0; }
@@ -169,7 +160,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .sub.go .sub-ico { animation: launch .5s steps(6); }
 @keyframes launch { 40% { transform: scale(1.65); } }
 
-/* the name starts hidden behind its icon and slides out */
 .sub-name {
   position: absolute; z-index: 1; top: 0; height: var(--sico);
   left: calc(50% + var(--sico) * .62 + 10px);
@@ -215,8 +205,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s;
 }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
-
-/* ---------- player ---------- */
 
 #player {
   position: absolute; z-index: 6; right: calc(18px + env(safe-area-inset-right)); bottom: calc(18px + env(safe-area-inset-bottom));
@@ -289,8 +277,6 @@ input[type=range]::-moz-range-thumb { width: 6px; height: 14px; border: 1px soli
 #tracklist button:hover { background: #4a1fa8; color: #fff; }
 #tracklist .cur button { color: #fff; background: linear-gradient(#a56bff 0 50%, #7a35ff 50% 100%); text-shadow: 1px 1px 0 #2a0b60; }
 
-/* ---------- popup windows (controls) ---------- */
-
 .win-ov { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; padding: 40px 12px 12px; background: rgba(7, 2, 15, .62); }
 .win-ov.show .win { animation: winpop .28s steps(6); }
 @keyframes winpop { from { transform: translateY(14px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -313,7 +299,6 @@ input[type=range]::-moz-range-thumb { width: 6px; height: 14px; border: 1px soli
 .win-body { padding: 12px; overflow-y: auto; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
 .win-body .empty { padding: 18px 8px; text-align: center; font: 12px var(--font); letter-spacing: .06em; color: var(--dim); }
 
-/* controls window */
 .win-body h3 { margin: 0 0 8px; font: bold 11px var(--font); letter-spacing: .16em; color: var(--p3); text-shadow: 1px 1px 0 var(--ink); }
 .win-body h3 + .keys + h3 { margin-top: 16px; }
 .keys { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; align-items: center; font: 12px var(--font); }
@@ -323,8 +308,6 @@ input[type=range]::-moz-range-thumb { width: 6px; height: 14px; border: 1px soli
 }
 .keys span { color: var(--dim); }
 .tip { margin-top: 16px; font: 11px/1.5 var(--font); color: var(--dim); }
-
-/* ---------- boot screen (download counter + intro video) ---------- */
 
 #boot { position: fixed; inset: 0; z-index: 50; background: #000; display: grid; place-items: center; overflow: hidden; transition: opacity 1.1s ease; }
 #boot.gone { opacity: 0; pointer-events: none; }
@@ -349,21 +332,15 @@ input[type=range]::-moz-range-thumb { width: 6px; height: 14px; border: 1px soli
 @keyframes blink { 50% { opacity: .25; } }
 #skip { position: absolute; right: 18px; bottom: 14px; z-index: 3; font: 11px var(--font); letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .5); pointer-events: none; }
 
-/* ---------- other screens ---------- */
-
-/* lighter on phones */
 html.low .w2, html.low .w3, html.low #bg::after { display: none; }
 html.low .cat.act .fl { animation: none; }
 html.low #player.playing { box-shadow: 0 0 0 1px var(--ink), 4px 4px 0 rgba(10, 2, 30, .55); }
 
-/* only used if you set respectReducedMotion in config.js */
 html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce #gate { animation: none; }
 
-/* phones: buttons in the top bar lose their text, the picture is enough */
 @media (max-width: 700px) {
 }
 
-/* phone portrait */
 @media (max-width: 700px) and (orientation: portrait) {
   :root { --cico: 64px; --sico: 46px; --sstep: 58px; --gap: 16px; --cw: 96px; --ry: 13vh; --maxd: 5; --ax: calc(32vw - var(--cw) / 2); }
   .sub-name { font-size: 13px; letter-spacing: .06em; }
@@ -376,7 +353,6 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
   .subs { top: calc(var(--cico) + 50px); }
 }
 
-/* short screens (phones sideways) */
 @media (max-height: 520px) {
   :root { --cico: 46px; --sico: 32px; --sstep: 40px; --gap: 10px; --ry: 11vh; --maxd: 3; }
   #player { width: min(320px, 55vw); bottom: 10px; right: 12px; padding-bottom: 5px; grid-template-columns: 58px 1fr; gap: 4px 0; }
@@ -388,10 +364,8 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
   .win { max-height: 86vh; }
 }
 
-/* big screens */
 @media (min-width: 1700px) { #player { width: 420px; } .ttl { font-size: 16px; } }
 
-/* ---------- the talking splash line ---------- */
 #splash {
   position: absolute; z-index: 3; left: 50%; top: 44px; max-width: min(92vw, 760px); translate: -50% 0;
   padding: 4px 12px; text-align: center; font: bold 13px/1.35 var(--font); letter-spacing: .06em; color: #fff;
@@ -411,7 +385,6 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 @media (max-height: 520px) { :root { --ry: 54px; } #splash { top: 38px; font-size: 12px; } }
 @media (max-width: 700px) { #splash { font-size: 11px; top: 40px; max-width: 94vw; } }
 
-/* ---------- top bar icon buttons ---------- */
 .tr-ic { width: 14px; height: 14px; display: block; flex: none; object-fit: contain; }
 #status > .tbtn { gap: 5px; }
 @media (max-width: 700px) {
@@ -426,7 +399,6 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 }
 @media (max-width: 340px) { #status > #meter { display: none; } }
 
-/* ---------- shared window bits ---------- */
 .tab-go {
   padding: 3px 10px; font: bold 10px var(--font); letter-spacing: .12em; color: #fff; text-shadow: 1px 1px 0 #2a0b60; cursor: pointer;
   background: linear-gradient(#a56bff 0 50%, #7a35ff 50% 100%); border: 1px solid; border-color: var(--hi) var(--lo) var(--lo) var(--hi); box-shadow: 0 0 0 1px var(--ink);
@@ -447,7 +419,6 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 .bar2 { height: 8px; margin: 6px 0 12px; background: #0b0218; border: 1px solid; border-color: #05010d #8a5bd6 #8a5bd6 #05010d; }
 .bar2 i { display: block; height: 100%; width: 0; background: linear-gradient(#fff, #c58cff); }
 
-/* ---------- trophies ---------- */
 .tr-sum { font: bold 11px var(--font); letter-spacing: .14em; color: var(--p3); text-shadow: 1px 1px 0 var(--ink); }
 .tr-list { display: grid; gap: 6px; }
 .tr { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; background: rgba(18, 4, 43, .45); border: 1px solid; border-color: #05010d #8a5bd6 #8a5bd6 #05010d; }
@@ -472,7 +443,6 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 .tt-tx span { display: block; margin-top: 1px; font: 11px/1.35 var(--font); color: var(--dim); }
 .tt-tx em { display: block; margin-top: 4px; font: bold 11px/1.35 var(--font); font-style: normal; color: var(--pk); }
 
-/* ---------- save data ---------- */
 .sv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .sv > .sv-grid { margin-bottom: 14px; }
 .sv-grid .sv { display: flex; flex-direction: column; gap: 2px; padding: 6px 8px; background: rgba(18, 4, 43, .45); border: 1px solid; border-color: #05010d #8a5bd6 #8a5bd6 #05010d; }
@@ -480,7 +450,6 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 .sv-grid .sv b { font: bold 13px var(--font); color: #fff; word-break: break-word; }
 .mem { margin-top: 14px; font: bold 9px var(--font); letter-spacing: .16em; color: var(--dim); }
 
-/* ---------- games ---------- */
 .gm-menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
 .gm-card {
   display: flex; flex-direction: column; gap: 4px; padding: 10px; text-align: left; cursor: pointer; color: #fff;
@@ -534,14 +503,12 @@ body.gaming #player { z-index: 26; }
 .gm-hr { display: flex; gap: 6px; }
 .gm-modes { display: grid; gap: 10px; }
 
-/* ---------- eyes pet ---------- */
 #pet { display: block; height: 18px; width: auto; overflow: visible; cursor: pointer; pointer-events: auto; }
 #views-wrap.pet #eyes { display: none; }
 #views-wrap.pet { cursor: pointer; }
 .hearts { position: fixed; z-index: 60; pointer-events: none; font: bold 12px var(--font); color: var(--pk); text-shadow: 1px 1px 0 var(--ink); animation: floaty 1.1s steps(11) forwards; }
 @keyframes floaty { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-26px); opacity: 0; } }
 
-/* ---------- seasons ---------- */
 body.s-xmas #top::after, body.s-xmas #top::before {
   content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 9px; pointer-events: none;
   background-repeat: repeat-x; background-size: 40px 9px;
