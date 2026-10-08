@@ -122,6 +122,7 @@
   V.div = function () {
     var d = 1;
     if (V.lite) d = 2;
+    if (DW.gaming) d = Math.max(d, 3);
     if (!document.hasFocus()) d = Math.max(d, 2);
     if (!A.playing && performance.now() - act > 30000) d = Math.max(d, 4);
     return d;
