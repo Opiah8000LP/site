@@ -1,7 +1,3 @@
-/* style.css -- dweeb os. purple, hard edges, 2006.
-   no border-radius anywhere, no blur glows: bevels, 1px outlines, hard shadows, split-gloss bars.
-   sizes are clamp()s off vmin so it scales on its own, media queries at the bottom fix the odd screens */
-
 :root {
   --bg0: #07020f;
   --p1: #7a35ff;
