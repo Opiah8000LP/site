@@ -4,21 +4,21 @@
   --p2: #a56bff;
   --p3: #d9bcff;
   --pk: #ff6bd6;
-  --ink: #12042b;      /* the dark outline used everywhere */
-  --hi: #e9d4ff;       /* bevel highlight */
-  --lo: #3a127a;       /* bevel shadow */
+  --ink: #12042b;
+  --hi: #e9d4ff;
+  --lo: #3a127a;
   --txt: #f6edff;
   --dim: #c9b0ea;
-  --p: 0;              /* beat strength 0-1, js writes this every frame */
+  --p: 0;
 
-  --cico: clamp(52px, 11vmin, 120px);   /* category icon */
-  --sico: clamp(36px, 7.4vmin, 72px);   /* sub icon */
-  --sstep: clamp(46px, 9vmin, 90px);    /* distance between sub items */
-  --gap: clamp(12px, 3vmin, 30px);      /* extra space around the selected one */
-  --cw: clamp(92px, 14vw, 170px);       /* width of one category column */
-  --ry: clamp(70px, 16vh, 170px);       /* top of the category row */
-  --ax: calc(24vw - var(--cw) / 2);     /* where the selected column sits */
-  --maxd: 4;                            /* how many sub items show below the selected one (js reads this) */
+  --cico: clamp(52px, 11vmin, 120px);
+  --sico: clamp(36px, 7.4vmin, 72px);
+  --sstep: clamp(46px, 9vmin, 90px);
+  --gap: clamp(12px, 3vmin, 30px);
+  --cw: clamp(92px, 14vw, 170px);
+  --ry: clamp(70px, 16vh, 170px);
+  --ax: calc(24vw - var(--cw) / 2);
+  --maxd: 4;
   --font: Tahoma, Verdana, Geneva, "DejaVu Sans", sans-serif;
   --mono: "Lucida Console", Consolas, "DejaVu Sans Mono", "Courier New", monospace;
 }
