@@ -385,7 +385,7 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 @media (max-height: 520px) { :root { --ry: 54px; } #splash { top: 38px; font-size: 12px; } }
 @media (max-width: 700px) { #splash { font-size: 11px; top: 40px; max-width: 94vw; } }
 
-.tr-ic { width: 14px; height: 14px; display: block; flex: none; }
+.tr-ic { width: 14px; height: 14px; display: block; flex: none; object-fit: contain; }
 #status > .tbtn { gap: 5px; }
 @media (max-width: 700px) {
   #status > .tbtn span { display: none; }
@@ -419,7 +419,6 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 .bar2 { height: 8px; margin: 6px 0 12px; background: #0b0218; border: 1px solid; border-color: #05010d #8a5bd6 #8a5bd6 #05010d; }
 .bar2 i { display: block; height: 100%; width: 0; background: linear-gradient(#fff, #c58cff); }
 
-/* ---------- trophies ---------- */
 .tr-sum { font: bold 11px var(--font); letter-spacing: .14em; color: var(--p3); text-shadow: 1px 1px 0 var(--ink); }
 .tr-list { display: grid; gap: 6px; }
 .tr { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; background: rgba(18, 4, 43, .45); border: 1px solid; border-color: #05010d #8a5bd6 #8a5bd6 #05010d; }
@@ -444,7 +443,6 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 .tt-tx span { display: block; margin-top: 1px; font: 11px/1.35 var(--font); color: var(--dim); }
 .tt-tx em { display: block; margin-top: 4px; font: bold 11px/1.35 var(--font); font-style: normal; color: var(--pk); }
 
-/* ---------- save data ---------- */
 .sv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .sv > .sv-grid { margin-bottom: 14px; }
 .sv-grid .sv { display: flex; flex-direction: column; gap: 2px; padding: 6px 8px; background: rgba(18, 4, 43, .45); border: 1px solid; border-color: #05010d #8a5bd6 #8a5bd6 #05010d; }
@@ -452,7 +450,6 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 .sv-grid .sv b { font: bold 13px var(--font); color: #fff; word-break: break-word; }
 .mem { margin-top: 14px; font: bold 9px var(--font); letter-spacing: .16em; color: var(--dim); }
 
-/* ---------- games ---------- */
 .gm-menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
 .gm-card {
   display: flex; flex-direction: column; gap: 4px; padding: 10px; text-align: left; cursor: pointer; color: #fff;
@@ -496,7 +493,15 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 }
 .gm-pb:active { border-color: var(--lo) var(--hi) var(--hi) var(--lo); }
 .gm-help { margin-top: 8px; font: 10px/1.4 var(--font); color: var(--dim); text-align: center; }
-body.gaming #splash { opacity: 0 !important; }
+body.gaming #bg, body.gaming #fx, body.gaming #xmb, body.gaming #hint, body.gaming #top, body.gaming #splash { visibility: hidden; }
+body.gaming #player { z-index: 26; }
+.win-ov.full { padding: 0; background: #07020f; }
+.win-ov.full .win { width: 100%; max-width: none; height: 100%; max-height: none; border-width: 0; box-shadow: none; }
+.win-ov.full .win-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+.win-ov.full .gm-stage { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.gm-hd, .gm-hud { width: 100%; max-width: 640px; }
+.gm-hr { display: flex; gap: 6px; }
+.gm-modes { display: grid; gap: 10px; }
 
 #pet { display: block; height: 18px; width: auto; overflow: visible; cursor: pointer; pointer-events: auto; }
 #views-wrap.pet #eyes { display: none; }
@@ -517,3 +522,5 @@ body.s-halloween #top::before {
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 90'%3E%3Cg stroke='%23f6edff' stroke-width='1' fill='none' transform='translate(90 0) scale(-1 1)'%3E%3Cpath d='M0 0L90 70M0 0L70 90M0 0L90 30M0 0L30 90M0 0L90 0M0 0L0 90'/%3E%3Cpath d='M18 0Q14 14 0 18M36 0Q30 30 0 36M54 0Q46 46 0 54M72 0Q62 62 0 72'/%3E%3C/g%3E%3C/svg%3E") right top / 90px 90px no-repeat;
 }
 @media (max-width: 700px) { #trophy { top: 30px; } }
+.gm-pad { width: 100%; max-width: 420px; }
+.gm-pad .gm-pb { min-width: 0; }
