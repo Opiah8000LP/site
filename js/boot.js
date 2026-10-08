@@ -56,10 +56,10 @@
       c.getRandomValues(u);
       return ((u[0] & 0x1FFFFF) * 4294967296 + u[1]) / 9007199254740992 < 1 / odds;
     }
-    function grab(src, fv, fallback) {
+    function grab(src, fv, fallback, rare) {
       fetch(src)
         .then(function (r) { if (!r.ok) throw 0; return r.blob(); })
-        .then(function (bl) { introURL = URL.createObjectURL(bl); })
+        .then(function (bl) { introURL = URL.createObjectURL(bl); if (rare && DW.trophy) DW.trophy.award('rare'); })
         .catch(function () {})
         .then(function () {
           if (!introURL && fallback) return grab(fallback, fv);
@@ -69,7 +69,7 @@
     if (I.src || I2.src) {
       var fv = job(90000), lucky = rare();
       try { if (lucky) localStorage.setItem('dw-intro2', String((+localStorage.getItem('dw-intro2') || 0) + 1)); } catch (e) {}
-      if (lucky) grab(I2.src || 'video/intro2.mp4', fv, I.src);
+      if (lucky) grab(I2.src || 'video/intro2.mp4', fv, I.src, true);
       else if (I.src) grab(I.src, fv);
       else fv();
     }
