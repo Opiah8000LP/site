@@ -109,6 +109,7 @@
     clearTimeout(spotT);
     spotT = setTimeout(function () {
       var c = cats[ci], s = c.id + (c.empty ? '' : '/' + c.subs[memo[ci]].id);
+      if (DW.trophy) DW.trophy.mark('hopper', c.id);
       try { localStorage.setItem('dw-spot', s); } catch (e) {}
       try { history.replaceState(null, '', '#' + s); } catch (e) {}
     }, 220);
@@ -176,6 +177,7 @@
   };
 
   function go(s) {
+    if (DW.trophy) DW.trophy.mark('tourist', s.id);
     var u = DW.safeUrl(s.url);
     if (!u) { DW.toast(s.id.toUpperCase() + ' has no link yet'); return; }
     s.el.classList.add('go');
