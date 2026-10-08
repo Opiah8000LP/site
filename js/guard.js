@@ -20,4 +20,3 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
     navigator.serviceWorker.register('sw.js').catch(function () {});
   });
 }
-
