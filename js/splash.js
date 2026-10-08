@@ -4,7 +4,9 @@
   var lastInput = Date.now(), swears = 0, lastReact = 0;
   var born = Date.now(), keys = 0, clicks = 0, idleSaid = 0, silent = false, lastWake = 0;
   var ly = { k: -1, on: false };
-  var visits = 1;
+  var visits = 1, seasonNext = false;
+  function tro(id) { try { if (DW.trophy) DW.trophy.award(id); } catch (e) {} }
+  function gaming() { return document.body.classList.contains('gaming'); }
 
   var D = {
     on: true, email: '', boss: 'NickEh30', lines: [], scolds: [], every: [9, 18], singChance: 0.25, mailChance: 0.08
@@ -47,8 +49,8 @@
     noon: ['good afternoon, almost bedtime?', 'holy brotallll #respect.', 'half the day is gone, keep going, its almost rest time'],
     evening: ['good evening, perfect music time aint it?', 'the time reminnds me of a song... goodmorning afternoon.. i didnt think that id seeing YOU so soon...', 'wasnt it just 11 half a minute ago?']
   };
-  var HELLO_NEW = ['welcome to DWEEB//OS. take a look around!', 'first time here? welcome in.'];
-  var HELLO_BACK = ['welcome back! visit #{n}.', 'oh, you again! visit #{n}. i missed you.', 'back for more? visit #{n}.'];
+  var HELLO_NEW = ['Hey, you seem new? Take a look around, this site is made purely for RDweeb.'];
+  var HELLO_BACK = ['Hey! Just a reminder this site is a site about RDweeb!'];
   var NOW = ['now playing: {t}', '{t}. good pick.', 'ooh, {t}.', 'this one is {t}{by}.'];
   var PAUSED = ['paused. i will wait.', 'silence. spooky.', 'the music stopped.'];
   var RESUME = ['back in business!', 'and we are rolling again.', 'there it is.'];
@@ -292,24 +294,25 @@
   }
   function talk() {
     if (!live || silent) return;
-    if (document.hidden || sing || ly.on) return resume();
+    if (document.hidden || sing || ly.on || gaming()) return resume();
     var idle = Date.now() - lastInput > 60000, r = Math.random();
     var after = resume, h = new Date().getHours();
     if (idle) {
       idleSaid++;
-      if (idleSaid > 3) { silent = true; show(pick(FADE), { hold: 2600, after: function () { silent = true; } }); return; }
+      if (idleSaid > 3) { silent = true; tro('alone'); show(pick(FADE), { hold: 2600, after: function () { silent = true; } }); return; }
       return show(pick(IDLE), { after: after });
     }
     idleSaid = 0;
     if (validMail() && r < cfg.mailChance) { show(pick(MAIL), { cls: 'mail', hold: 9000, after: after }); return; }
     if (hasPlain() && A.playing && r < cfg.singChance + (validMail() ? cfg.mailChance : 0)) { if (singPlain()) return; }
+    if (seasonNext && DW.season) { seasonNext = false; return show(pick(DW.season.pool()), { after: after }); }
     var x = Math.random();
-    if (x < 0.07) return episode(pick(CRISIS), 'scold', after);
+    if (x < 0.07) { tro('existential'); return episode(pick(CRISIS), 'scold', after); }
     if (x < 0.2) return show(pick(STATS), { after: after });
     var pool = CHAT.concat(cfg.lines, cfg.lines);
-    if (Math.random() < 0.25) {
-      pool = h < 5 ? DAY.night : h < 12 ? DAY.morning : h < 17 ? DAY.noon : h < 22 ? DAY.evening : DAY.night;
-    }
+    var q = Math.random();
+    if (DW.season && q < (DW.season.id ? 0.35 : 0.2)) pool = DW.season.pool();
+    else if (q < 0.5) pool = h < 5 ? DAY.night : h < 12 ? DAY.morning : h < 17 ? DAY.noon : h < 22 ? DAY.evening : DAY.night;
     show(pick(pool), { after: after });
   }
 
@@ -347,6 +350,7 @@
   }
   function scold() {
     swears++;
+    tro('potty');
     if (DW.cancelHot) DW.cancelHot();
     var t;
     if (swears === 1) t = SCOLD[0];
@@ -364,7 +368,7 @@
   }
   function typed(e) {
     try {
-      if (!live || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (!live || e.ctrlKey || e.metaKey || e.altKey || gaming()) return;
       var tg = e.target;
       if (tg && /^(input|textarea|select)$/i.test(tg.tagName) && tg.type !== 'range') return;
       wake();
@@ -375,7 +379,8 @@
         kon++;
         if (kon === KONAMI.length) {
           kon = 0;
-          react('+30 lives. you unlocked absolutely nothing. congrats!', 'sing');
+          tro('konami');
+          react('+30 lives!', 'sing');
           if (DW.vis && DW.vis.state) DW.vis.state.pulse = 1;
         }
       } else kon = kk === KONAMI[0] ? 1 : 0;
@@ -417,6 +422,7 @@
         } else if (r === '__crisis') {
           lastReact = Date.now();
           clearTimeout(timer);
+          tro('existential');
           episode(pick(CRISIS), 'scold', resume);
         } else if (r === '__stat') {
           react(pick(STATS));
@@ -440,6 +446,7 @@
     if (!box || !txt || cfg.on === false) { if (box) box.remove(); box = null; return; }
 
     try { visits = (parseInt(localStorage.getItem('dw-visits'), 10) || 0) + 1; localStorage.setItem('dw-visits', visits); } catch (e) {}
+    DW.visits = visits;
 
     DW.vis.bind('splash', txt);
 
@@ -466,7 +473,7 @@
       ly.k = -1;
       if (!live || t.file === lastTrack) { lastTrack = t.file; return; }
       lastTrack = t.file;
-      if (silent || Date.now() - lastReact < 2500) { resume(); return; }
+      if (silent || gaming() || Date.now() - lastReact < 2500) { resume(); return; }
       if (earlyLyric(t)) { resume(); return; }
       clearTimeout(timer);
       show(pick(NOW), { after: resume });
@@ -474,7 +481,7 @@
     var wasPlaying = false;
     A.on('state', function () {
       if (firstState) { firstState = false; wasPlaying = A.playing; return; }
-      if (!live || silent) { wasPlaying = A.playing; return; }
+      if (!live || silent || gaming()) { wasPlaying = A.playing; return; }
       if (!A.playing && (ly.on || sing)) { sing = null; ly.on = false; ly.k = -1; hide(); resume(); }
       if (wasPlaying && !A.playing && !A.el.ended && Date.now() - lastReact > 4000 && Math.random() < 0.5) { clearTimeout(timer); show(pick(PAUSED), { after: resume }); }
       else if (!wasPlaying && A.playing && Date.now() - lastReact > 4000 && Math.random() < 0.4) { clearTimeout(timer); show(pick(RESUME), { after: resume }); }
@@ -488,6 +495,7 @@
     lastInput = Date.now();
     setTimeout(function () {
       if (Date.now() - lastReact < 2000 || ly.on) { resume(); return; }
+      seasonNext = true;
       show(pick(visits > 1 ? HELLO_BACK : HELLO_NEW), { after: resume });
     }, 1400);
   };
