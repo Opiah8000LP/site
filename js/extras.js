@@ -68,7 +68,9 @@
 
     addEventListener('keydown', function (e) {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      if (!document.body.classList.contains('live')) return;
+      if (!document.body.classList.contains('live') || document.body.classList.contains('gaming')) return;
+      var tg = e.target;
+      if (tg && /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName) && tg.type !== 'range') return;
       var k = e.key, hit = true;
       if (k === 'h' || k === 'H' || k === '?') { if (k === '?') help.toggle(); else DW.later(help.toggle); }
       else if (k === 'm' || k === 'M') DW.later(DW.player.toggleMute);
@@ -92,4 +94,5 @@
     A.on('track', title);
   };
 })();
+
 
