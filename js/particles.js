@@ -29,6 +29,7 @@
       var S = DW.vis.state, k = DW.react.particles || 0;
       var boost = 1 + (S.speed * 1.4 + S.level * 1.2 + S.pulse * 1.5) * k;
       ctx.clearRect(0, 0, w, h);
+      if (DW.gaming) return;
       ctx.fillStyle = '#e0c4ff';
       var lim = DW.vis.lite ? N >> 1 : N;
       for (var i = 0; i < lim; i++) {
@@ -41,6 +42,7 @@
         ctx.arc(p.x, p.y, p.r * (1 + S.pulse * 0.5 * k), 0, 6.283);
         ctx.fill();
       }
+      if (DW.season && DW.season.kind) DW.season.draw(ctx, t, w, h, d);
     }
     requestAnimationFrame(draw);
   };
