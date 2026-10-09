@@ -82,9 +82,6 @@ DW.splash = {
     'Did you know?',
     'Woah look i can speak mom!',
     'Eat the frog. Now.',
-
-    // EMOTIONS: put <name> before the words you want to change. it lasts until the next tag,
-    // <n> goes back to normal, <wait> pauses the typing. full list in the README.
     'HELLO <angry>WORLD',
     'Hello <shy>world... <wait>sorry',
     'I have <sad>never<n> seen the sun <sleepy>zzz',
