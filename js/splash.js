@@ -124,7 +124,7 @@
     whisper: ['<whisper>Psst.. this is me whispering...'],
     yell: ['<yell>THIS IS ME YELLING!'],
     sleepy: ['<sleepy>This is me being.. sleepy....'],
-    love: ['<love>This is me loving!'],
+    lovely: ['<love>This is me loving!'],
     silly: ['<silly>This is me being a bit silly!'],
     spooky: ['<spooky> This is me being spooky and scary....'], scary: ['<spooky> This is me being spooky and scary....'],
     dizzy: ['<dizzy>This is me being.. dizzy..'],
