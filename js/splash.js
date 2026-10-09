@@ -134,7 +134,7 @@
     sneaky: ['<sneaky>This is me trying to be sneaky...'],
     nervous: ['<nervous>This is me being nervous...'],
     proud: ['<proud> This is me being proud!'],
-    sing: ['<sing>Thiisss isss meee singinggggg'],
+    singing: ['<sing>Thiisss isss meee singinggggg'],
     hello: ['hello yourself!', 'hi hi hi!'], hi: ['hey there!', 'hi! i have limited free will, cant talk..'],
     hey: ['hey! psst. try some naughty words, like heck.'], yo: ['yooo.'],
     help: ['press H. no really. H.'],
