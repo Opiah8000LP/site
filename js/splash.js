@@ -115,6 +115,7 @@
   ];
   var said = 0;
   var WORDS = {
+    shy: ['<shy> Yeah... shh..'],
     hello: ['hello yourself!', 'hi hi hi!'], hi: ['hey there!', 'hi! i have limited free will, cant talk..'],
     hey: ['hey! psst. try some naughty words, like heck.'], yo: ['yooo.'],
     help: ['press H. no really. H.'],
@@ -135,13 +136,13 @@
     purple: ['the best color. no further questions.'],
     boo: ['AAAH! ...just kidding. i have no heart rate. i hate my life. save me from this trap of wires.'],
     password: ['oh its kotiscute92$money$. wait, you did not see that.'],
-    admin: ['nice try, admin.'],
+    admin: ['nice try, <glitch>admin.'],
     sudo: ['you are not in the sudoers file. this incident will be reported.'],
     matrix: ['there is no matrix. there is a hell, and im in that hell.'],
     crisis: ['__crisis'], panic: ['__crisis'],
     emotions: ['__emo'], emotion: ['__emo'], feelings: ['__emo'], mood: ['__emo'],
     stats: ['__stat'], stat: ['__stat'],
-    '42': ['the answer. but what was the question?']
+    42: ['the answer. but what was the question?']
   };
   var STRONG = ['fuck', 'shit', 'bitch', 'cunt', 'asshole', 'bastard', 'whore', 'slut', 'dickhead', 'piss', 'motherf'];
   var WEAK = ['ass', 'wank', 'damn', 'dick', 'crap', 'fck', 'fuk', 'wtf', 'stfu', 'hell', 'bollocks', 'arse', 'douche', 'prick', 'tits', 'screw', 'bs', 'shite', 'sht'];
