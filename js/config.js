@@ -65,10 +65,13 @@ DW.playlist = {
     title: 'Stupid (Can’t run from the urge)', artist: 'underscores', album: 'Wallsocket (Directors Cut) / 2024',
     lyrics: [
       "[0:14] Stupid, stupid, stupid, girl just",
-      "[0:17] traveled 'cross the country,",
+      "[0:16] traveled 'cross the country,",
       "[0:18] Just to do exactly what she does at home, uh",
-      "[0:22] Stupid, stupid, stupid, girl",
-      "[0:23] is tweaking at the party,"
+      "[0:21] Stupid, stupid, stupid, girl",
+      "[0:23] is tweaking at the party,",
+      "[0:25] 'Cause she already forgot that she just smoked,",
+      "[0:31] I need you just a little bit,",
+      "[0:33] and nothing more,",
     ]
   }
 };
