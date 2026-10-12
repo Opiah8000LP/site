@@ -1,8 +1,6 @@
 (function () {
   var DW = window.DW, E = (DW.emo = {});
 
-  // name -> { speed: typing delay multiplier (bigger = slower), alias: [other names] }
-  // the look of each one lives in style.css (.em-<name>)
   var DEF = {
     angry:    { speed: 0.8,  alias: ['mad', 'rage', 'furious'] },
     shy:      { speed: 1.7,  alias: ['timid', 'bashful'] },
@@ -35,7 +33,6 @@
   E.names = NAMES;
   E.def = DEF;
 
-  // text -> list of tokens: { c: 'x', e: 'angry' | null } or { wait: ms }
   E.tokens = function (text) {
     var out = [], cur = null, re = /<(\/?)\s*([a-z0-9]+)\s*>/gi, last = 0, m, i, s = String(text);
     function lit(str) { for (i = 0; i < str.length; i++) out.push({ c: str.charAt(i), e: cur }); }
@@ -55,7 +52,6 @@
       void tag;
     }
     lit(s.slice(last));
-    // a leading/trailing space next to a tag would just look like a gap
     return out;
   };
 
@@ -63,7 +59,6 @@
     return E.tokens(text).map(function (t) { return t.c || ''; }).join('');
   };
 
-  // writes tokens into el one by one. state keeps track of the current span.
   E.writer = function (el) {
     var st = { seg: null, e: undefined, word: null, n: 0 };
     el.textContent = '';
@@ -94,20 +89,17 @@
     };
   };
 
-  // instant (no typing)
   E.set = function (el, text) {
     var put = E.writer(el);
     E.tokens(text).forEach(put);
   };
 
-  // delay (ms) to wait after this token before the next one
   E.delay = function (t, base) {
     if (t.wait) return t.wait;
     var k = t.e ? DEF[t.e].speed : 1;
     return base * k;
   };
 
-  // one line showing every emotion, used by the "emotions" easter egg
   E.demo = function () {
     return NAMES.map(function (k) { return 'this is <' + k + '>' + k + '<n> okay'; });
   };
