@@ -139,7 +139,6 @@
     c.globalAlpha = 1;
   };
 
-  // switch to a season (or none). manual = picked by typing its name, which never gives the trophy
   S.set = function (id, manual) {
     var i, d = null;
     for (i = 0; i < DAYS.length; i++) {
