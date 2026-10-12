@@ -9,7 +9,7 @@
   function gaming() { return document.body.classList.contains('gaming'); }
 
   var D = {
-    on: true, email: '', boss: 'NickEh30', lines: [], scolds: [], every: [9, 18], singChance: 0.25, mailChance: 0.08
+    on: true, email: '', boss: 'Dweeb', lines: [], scolds: [], every: [9, 18], singChance: 0.25, mailChance: 0.08
   };
 
   var CHAT = [
