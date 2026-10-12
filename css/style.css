@@ -1,24 +1,28 @@
+/* style.css -- dweeb os. purple, hard edges, 2006.
+   no border-radius anywhere, no blur glows: bevels, 1px outlines, hard shadows, split-gloss bars.
+   sizes are clamp()s off vmin so it scales on its own, media queries at the bottom fix the odd screens */
+
 :root {
   --bg0: #65048b;
   --p1: #d743e6;
   --p2: #f651fc;
   --p3: #f3b5f6;
   --pk: #719ee8;
-  --ink: #75099a;
-  --hi: #f8cffa;
-  --lo: #ad21cf;
+  --ink: #75099a;      /* the dark outline used everywhere */
+  --hi: #f8cffa;       /* bevel highlight */
+  --lo: #ad21cf;       /* bevel shadow */
   --txt: #fdeeff;
   --dim: #e8bdf2;
-  --p: 0;
+  --p: 0;              /* beat strength 0-1, js writes this every frame */
 
-  --cico: clamp(52px, 11vmin, 120px);
-  --sico: clamp(36px, 7.4vmin, 72px);
-  --sstep: clamp(46px, 9vmin, 90px);
-  --gap: clamp(12px, 3vmin, 30px);
-  --cw: clamp(92px, 14vw, 170px);
-  --ry: clamp(70px, 16vh, 170px);
-  --ax: calc(24vw - var(--cw) / 2);
-  --maxd: 4;
+  --cico: clamp(52px, 11vmin, 120px);   /* category icon */
+  --sico: clamp(36px, 7.4vmin, 72px);   /* sub icon */
+  --sstep: clamp(46px, 9vmin, 90px);    /* distance between sub items */
+  --gap: clamp(12px, 3vmin, 30px);      /* extra space around the selected one */
+  --cw: clamp(92px, 14vw, 170px);       /* width of one category column */
+  --ry: clamp(70px, 16vh, 170px);       /* top of the category row */
+  --ax: calc(24vw - var(--cw) / 2);     /* where the selected column sits */
+  --maxd: 4;                            /* how many sub items show below the selected one (js reads this) */
   --font: Tahoma, Verdana, Geneva, "DejaVu Sans", sans-serif;
   --mono: "Lucida Console", Consolas, "DejaVu Sans Mono", "Courier New", monospace;
 }
