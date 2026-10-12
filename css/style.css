@@ -43,7 +43,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 #warn { position: fixed; left: 50%; top: 34px; z-index: 120; transform: translateX(-50%); width: min(92vw, 640px); padding: 8px 12px; text-align: center; font: bold 11px/1.5 var(--font); letter-spacing: .05em; color: #ffffff; background: #d00ddc; border: 2px solid; border-color: #faa6fd #b328db #b328db #faa6fd; box-shadow: 0 0 0 1px #9f17c7, 3px 3px 0 rgba(0, 0, 0, .5); }
 #dbg { position: fixed; left: 8px; bottom: 8px; z-index: 99; padding: 6px 8px; font: 11px/1.4 var(--mono); color: #e9ffd0; background: rgba(0, 0, 0, .8); border: 1px solid #66ff66; pointer-events: none; }
 
-/* app + background */
+/* ---------- app shell + background ---------- */
 
 #app {
   position: fixed; inset: 0; overflow: hidden;
@@ -52,6 +52,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 #app.on { opacity: 1; }
 
+/* faint scanlines over the background only (under the menu) for the crt crunch */
 #app::after {
   content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .14;
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .35) 0 1px, transparent 1px 3px);
@@ -68,6 +69,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   opacity: .7; will-change: opacity;
 }
 #waves { position: absolute; inset: 0; }
+/* js moves + stretches these every frame (speed follows the song) */
 .wave { position: absolute; left: 0; bottom: 0; width: 200%; height: 52%; transform-origin: 50% 100%; will-change: transform; }
 .w2 { height: 46%; bottom: -3%; }
 .w3 { height: 60%; bottom: -6%; }
@@ -77,7 +79,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 #fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-/* top status bar */
+/* ---------- top status bar ---------- */
 
 #top {
   position: absolute; top: 0; left: 0; right: 0; z-index: 5;
@@ -101,13 +103,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 #status > #meter { align-items: flex-end; gap: 2px; padding: 5px 10px; }
 #meter i { width: 4px; height: 100%; background: linear-gradient(#ffffff, #719ee8); transform-origin: 50% 100%; transform: scaleY(.18); }
 
-/* buttons */
+/* buttons js adds to the top bar (?) */
 #status > .tbtn { gap: 6px; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: inherit; color: #ffffff; text-shadow: inherit; }
 .tbtn img { height: 14px; width: auto; display: block; image-rendering: pixelated; }
 .tbtn:hover, .tbtn:focus-visible { background: linear-gradient(#faa6fd 0 50%, #f651fc 50% 100%); outline: none; }
 .tbtn:active { background: linear-gradient(#e24fe9 0 50%, #e53eed 50% 100%); box-shadow: inset 1px 1px 0 rgba(0, 0, 0, .35); }
 
-/* the menu */
+/* ---------- the menu ---------- */
 
 #xmb { position: absolute; inset: 0; z-index: 2; }
 #cats { position: absolute; left: var(--ax); top: var(--ry); width: var(--cw); height: 0; }
@@ -167,6 +169,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .sub.go .sub-ico { animation: launch .5s steps(6); }
 @keyframes launch { 40% { transform: scale(1.65); } }
 
+/* the name starts hidden behind its icon and slides out */
 .sub-name {
   position: absolute; z-index: 1; top: 0; height: var(--sico);
   left: calc(50% + var(--sico) * .62 + 10px);
@@ -213,7 +216,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-/* player */
+/* ---------- player ---------- */
 
 #player {
   position: absolute; z-index: 6; right: calc(18px + env(safe-area-inset-right)); bottom: calc(18px + env(safe-area-inset-bottom));
@@ -286,7 +289,7 @@ input[type=range]::-moz-range-thumb { width: 6px; height: 14px; border: 1px soli
 #tracklist button:hover { background: #db27e4; color: #ffffff; }
 #tracklist .cur button { color: #ffffff; background: linear-gradient(#fb58ff 0 50%, #ea4ff2 50% 100%); text-shadow: 1px 1px 0 #c245de; }
 
-/* popup windows */
+/* ---------- popup windows (controls) ---------- */
 
 .win-ov { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; padding: 40px 12px 12px; background: rgba(101, 4, 139, .5); }
 .win-ov.show .win { animation: winpop .28s steps(6); }
@@ -321,7 +324,7 @@ input[type=range]::-moz-range-thumb { width: 6px; height: 14px; border: 1px soli
 .keys span { color: var(--dim); }
 .tip { margin-top: 16px; font: 11px/1.5 var(--font); color: var(--dim); }
 
-/* boot screen (download counter / intro video) */
+/* ---------- boot screen (download counter + intro video) ---------- */
 
 #boot { position: fixed; inset: 0; z-index: 50; background: #000000; display: grid; place-items: center; overflow: hidden; transition: opacity 1.1s ease; }
 #boot.gone { opacity: 0; pointer-events: none; }
@@ -346,17 +349,17 @@ input[type=range]::-moz-range-thumb { width: 6px; height: 14px; border: 1px soli
 @keyframes blink { 50% { opacity: .25; } }
 #skip { position: absolute; right: 18px; bottom: 14px; z-index: 3; font: 11px var(--font); letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .5); pointer-events: none; }
 
-/* other screens */
+/* ---------- other screens ---------- */
 
 /* lighter on phones */
 html.low .w2, html.low .w3, html.low #bg::after { display: none; }
 html.low .cat.act .fl { animation: none; }
 html.low #player.playing { box-shadow: 0 0 0 1px var(--ink), 4px 4px 0 rgba(117, 9, 154, .55); }
 
-/* implement a reducemotion config on phones that lag eventualyl, 'k? */
+/* only used if you set respectReducedMotion in config.js */
 html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce #gate { animation: none; }
 
-/* phones */
+/* phones: buttons in the top bar lose their text, the picture is enough */
 @media (max-width: 700px) {
 }
 
@@ -373,7 +376,7 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
   .subs { top: calc(var(--cico) + 50px); }
 }
 
-/* short screens_ */
+/* short screens (phones sideways) */
 @media (max-height: 520px) {
   :root { --cico: 46px; --sico: 32px; --sstep: 40px; --gap: 10px; --ry: 11vh; --maxd: 3; }
   #player { width: min(320px, 55vw); bottom: 10px; right: 12px; padding-bottom: 5px; grid-template-columns: 58px 1fr; gap: 4px 0; }
@@ -388,7 +391,7 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 /* big screens */
 @media (min-width: 1700px) { #player { width: 420px; } .ttl { font-size: 16px; } }
 
-/* the talking splash line */
+/* ---------- the talking splash line ---------- */
 #splash {
   position: absolute; z-index: 3; left: 50%; top: 44px; max-width: min(92vw, 760px); translate: -50% 0;
   padding: 4px 12px; text-align: center; font: bold 13px/1.35 var(--font); letter-spacing: .06em; color: #ffffff;
@@ -408,7 +411,7 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 @media (max-height: 520px) { :root { --ry: 54px; } #splash { top: 38px; font-size: 12px; } }
 @media (max-width: 700px) { #splash { font-size: 11px; top: 40px; max-width: 94vw; } }
 
-/* top bar icon buttons */
+/* ---------- top bar icon buttons ---------- */
 .tr-ic { width: 14px; height: 14px; display: block; flex: none; object-fit: contain; }
 #status > .tbtn { gap: 5px; }
 @media (max-width: 700px) {
@@ -423,7 +426,7 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 }
 @media (max-width: 340px) { #status > #meter { display: none; } }
 
-/* shared window */
+/* ---------- shared window bits ---------- */
 .tab-go {
   padding: 3px 10px; font: bold 10px var(--font); letter-spacing: .12em; color: #ffffff; text-shadow: 1px 1px 0 #c245de; cursor: pointer;
   background: linear-gradient(#fb58ff 0 50%, #ea4ff2 50% 100%); border: 1px solid; border-color: var(--hi) var(--lo) var(--lo) var(--hi); box-shadow: 0 0 0 1px var(--ink);
@@ -444,7 +447,7 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 .bar2 { height: 8px; margin: 6px 0 12px; background: #7d0fae; border: 1px solid; border-color: #6c078a #d863ed #d863ed #6c078a; }
 .bar2 i { display: block; height: 100%; width: 0; background: linear-gradient(#ffffff, #f872fc); }
 
-/* trophies */
+/* ---------- trophies ---------- */
 .tr-sum { font: bold 11px var(--font); letter-spacing: .14em; color: var(--p3); text-shadow: 1px 1px 0 var(--ink); }
 .tr-list { display: grid; gap: 6px; }
 .tr { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; background: rgba(159, 23, 199, .45); border: 1px solid; border-color: #6c078a #d863ed #d863ed #6c078a; }
@@ -469,7 +472,7 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 .tt-tx span { display: block; margin-top: 1px; font: 11px/1.35 var(--font); color: var(--dim); }
 .tt-tx em { display: block; margin-top: 4px; font: bold 11px/1.35 var(--font); font-style: normal; color: var(--pk); }
 
-/* save data */
+/* ---------- save data ---------- */
 .sv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .sv > .sv-grid { margin-bottom: 14px; }
 .sv-grid .sv { display: flex; flex-direction: column; gap: 2px; padding: 6px 8px; background: rgba(159, 23, 199, .45); border: 1px solid; border-color: #6c078a #d863ed #d863ed #6c078a; }
@@ -477,7 +480,7 @@ html.reduce .cat.act .fl, html.reduce .lico i, html.reduce .lico b, html.reduce 
 .sv-grid .sv b { font: bold 13px var(--font); color: #ffffff; word-break: break-word; }
 .mem { margin-top: 14px; font: bold 9px var(--font); letter-spacing: .16em; color: var(--dim); }
 
-/* games */
+/* ---------- games ---------- */
 .gm-menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
 .gm-card {
   display: flex; flex-direction: column; gap: 4px; padding: 10px; text-align: left; cursor: pointer; color: #ffffff;
@@ -531,14 +534,14 @@ body.gaming #player { z-index: 26; }
 .gm-hr { display: flex; gap: 6px; }
 .gm-modes { display: grid; gap: 10px; }
 
-/* eyes pet */
+/* ---------- eyes pet ---------- */
 #pet { display: block; height: 18px; width: auto; overflow: visible; cursor: pointer; pointer-events: auto; }
 #views-wrap.pet #eyes { display: none; }
 #views-wrap.pet { cursor: pointer; }
 .hearts { position: fixed; z-index: 60; pointer-events: none; font: bold 12px var(--font); color: var(--pk); text-shadow: 1px 1px 0 var(--ink); animation: floaty 1.1s steps(11) forwards; }
 @keyframes floaty { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-26px); opacity: 0; } }
 
-/* seasons */
+/* ---------- seasons ---------- */
 body.s-xmas #top::after, body.s-xmas #top::before {
   content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 9px; pointer-events: none;
   background-repeat: repeat-x; background-size: 40px 9px;
@@ -555,7 +558,7 @@ body.s-halloween #top::before {
 .gm-pad { width: 100%; max-width: 420px; }
 .gm-pad .gm-pb { min-width: 0; }
 
-/* emotion text */
+/* ---------- emotion text (js/emotion.js) ---------- */
 .em { display: inline; }
 .em-w { display: inline-block; white-space: nowrap; }
 .em-c { display: inline-block; will-change: transform; }
@@ -618,3 +621,73 @@ body.s-halloween #top::before {
 @keyframes em-jitter { 0% { transform: translate(0, 0); } 25% { transform: translate(1px, -1px); } 50% { transform: translate(-1px, 0); } 75% { transform: translate(0, 1px); } }
 @keyframes em-puff { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) translateY(-1px); } }
 html.reduce .em-c { animation: none; }
+
+/* ---------- season decorations (js/seasonfx.js) ---------- */
+#sfx { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+body.gaming #sfx { visibility: hidden; }
+
+/* halloween */
+.web { position: absolute; width: clamp(90px, 16vmin, 170px); height: clamp(90px, 16vmin, 170px); opacity: .8; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%23fff4ff' stroke-width='1.2' fill='none' stroke-linecap='round'%3E%3Cpath d='M0 0L100 78M0 0L82 100M0 0L100 38M0 0L42 100M0 0L100 4M0 0L4 100'/%3E%3Cpath d='M22 0Q17 17 0 22M44 0Q36 36 0 44M66 0Q56 56 0 66M88 0Q76 76 0 88'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat; filter: drop-shadow(0 0 3px rgba(0, 0, 0, .5)); }
+.web.tl { left: 0; top: 24px; }
+.web.tr { right: 0; top: 24px; transform: scaleX(-1); }
+.web.bl { left: 0; bottom: 0; transform: scaleY(-1); }
+.web.br { right: 0; bottom: 0; transform: scale(-1, -1); }
+body.s-halloween #player::after, body.s-halloween .win::after {
+  content: ''; position: absolute; right: -2px; top: -2px; width: 70px; height: 70px; pointer-events: none; opacity: .8; transform: scaleX(-1);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%23fff4ff' stroke-width='1.2' fill='none' stroke-linecap='round'%3E%3Cpath d='M0 0L100 78M0 0L82 100M0 0L100 38M0 0L42 100M0 0L100 4M0 0L4 100'/%3E%3Cpath d='M22 0Q17 17 0 22M44 0Q36 36 0 44M66 0Q56 56 0 66M88 0Q76 76 0 88'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat; filter: drop-shadow(0 0 2px rgba(0, 0, 0, .5));
+}
+body.s-halloween .win { position: relative; }
+body.s-halloween #player { overflow: visible; }
+.sp-wrap { position: absolute; top: 24px; left: 14%; width: 30px; margin-left: -15px; pointer-events: auto; cursor: pointer; transform-origin: 50% 0; animation: sp-sway 4.5s ease-in-out infinite; padding: 0 8px; box-sizing: content-box; }
+.sp-thread { position: absolute; left: 50%; top: 0; width: 1px; margin-left: -.5px; background: rgba(255, 255, 255, .85); pointer-events: none; }
+.sp-body { position: absolute; left: 50%; width: 30px; margin-left: -15px; margin-top: -2px; }
+.sp-body svg { display: block; width: 30px; height: 26px; overflow: visible; filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, .35)); }
+.sp-wrap.fallen { animation: sp-swing .5s ease-in-out infinite alternate; }
+.sp-wrap.climb { animation: sp-sway 1.6s ease-in-out infinite; }
+.sp-wrap.climb .sp-legs, .sp-wrap.fallen .sp-legs { animation: sp-legs .18s steps(2) infinite; transform-origin: 50% 50%; }
+@keyframes sp-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes sp-swing { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+@keyframes sp-legs { 0% { transform: scale(1, 1); } 100% { transform: scale(1.12, .9); } }
+.pk-wrap { position: absolute; left: calc(14px + env(safe-area-inset-left)); bottom: 56px; width: 64px; }
+.pk { display: block; width: 100%; overflow: visible; animation: pk-glow 2.4s ease-in-out infinite; }
+@keyframes pk-glow { 0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 150, 30, .7)); } 45% { filter: drop-shadow(0 0 12px rgba(255, 190, 60, 1)); } 50% { filter: drop-shadow(0 0 3px rgba(255, 150, 30, .4)); } }
+.gh-wrap { position: absolute; top: 28%; left: -80px; width: 46px; opacity: .55; animation: gh-fly 26s linear 6s infinite; }
+.gh { display: block; width: 100%; animation: gh-bob 1.6s ease-in-out infinite; }
+@keyframes gh-fly { from { transform: translateX(0); } to { transform: translateX(calc(100vw + 160px)); } }
+@keyframes gh-bob { 0%, 100% { transform: translateY(-8px); } 50% { transform: translateY(8px); } }
+
+/* christmas */
+.tree-wrap { position: absolute; left: calc(16px + env(safe-area-inset-left)); bottom: 54px; width: 118px; pointer-events: auto; cursor: pointer; }
+.tree { display: block; width: 100%; overflow: visible; filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, .3)); }
+.tree-star { position: absolute; left: 50%; top: -8px; width: 20px; margin-left: -10px; pointer-events: none; animation: star 1.8s ease-in-out infinite; }
+.tree-star svg { display: block; width: 100%; }
+@keyframes star { 0%, 100% { filter: drop-shadow(0 0 4px #ffd34d); transform: scale(1); } 50% { filter: drop-shadow(0 0 12px #fff2a0); transform: scale(1.12); } }
+.gifts { position: absolute; right: -34px; bottom: 0; width: 44px; pointer-events: none; }
+.lt { animation: twinkle 1.6s steps(1) infinite; }
+.lt1 { animation-duration: 1.2s; } .lt2 { animation-duration: 2s; } .lt3 { animation-duration: 1.4s; }
+@keyframes twinkle { 0%, 55% { opacity: 1; } 56%, 100% { opacity: .2; } }
+.tree-wrap.m1 .lt { animation-duration: .35s; }
+.tree-wrap.m2 .lt { animation: none; opacity: 1; }
+.tree-wrap.m3 .lt { animation-direction: reverse; animation-duration: .8s; }
+.tree-wrap.m3 .tree { filter: hue-rotate(80deg) drop-shadow(2px 3px 0 rgba(0, 0, 0, .3)); }
+.snow-top { position: absolute; left: 0; right: 0; top: 24px; height: 12px; opacity: .95;
+  background: radial-gradient(circle at 10px 0, #fff 0 7px, transparent 8px) 0 0 / 22px 12px repeat-x, radial-gradient(circle at 4px 0, #eaf4ff 0 5px, transparent 6px) 8px 0 / 17px 9px repeat-x; }
+body.s-xmas #player::before { content: ''; position: absolute; left: -2px; right: -2px; top: -9px; height: 11px; pointer-events: none;
+  background: radial-gradient(circle at 9px 11px, #fff 0 8px, transparent 9px) 0 0 / 20px 11px repeat-x, radial-gradient(circle at 3px 11px, #e6f2ff 0 5px, transparent 6px) 7px 0 / 14px 8px repeat-x; }
+
+/* valentine */
+.big-heart { position: absolute; left: calc(16px + env(safe-area-inset-left)); bottom: 56px; width: 58px; pointer-events: auto; cursor: pointer; animation: hbeat 1.2s ease-in-out infinite; }
+.big-heart.beat { animation: hbeat .3s ease-in-out 3; }
+.hrt { display: block; width: 100%; filter: drop-shadow(0 0 8px rgba(255, 100, 230, .9)); }
+@keyframes hbeat { 0%, 40%, 100% { transform: scale(1); } 20% { transform: scale(1.15); } 60% { transform: scale(1.08); } }
+.bunting { position: absolute; left: 0; right: 0; top: 24px; height: 16px; opacity: .95;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16'%3E%3Cpath d='M0 0H24' stroke='%23fff' stroke-opacity='.6'/%3E%3Cpath d='M12 15C3 8 5 2 9 3.5C11 4.2 12 5.5 12 5.5S13 4.2 15 3.5C19 2 21 8 12 15Z' fill='%23ff5ad8' stroke='%23b41fb0'/%3E%3C/svg%3E") 0 0 / 24px 16px repeat-x; }
+
+/* new year */
+.ny-banner { position: absolute; left: 50%; top: 82px; transform: translateX(-50%); padding: 4px 14px; font: bold 12px var(--font); letter-spacing: .3em; color: #fff4b8; text-shadow: 1px 1px 0 #75099a, 0 0 10px #ffd34d; animation: nyglow 1.4s ease-in-out infinite; white-space: nowrap; }
+@keyframes nyglow { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
+.streamers { position: absolute; left: 0; right: 0; top: 24px; height: 18px;
+  background: repeating-linear-gradient(90deg, #ff4d8a 0 14px, #ffd34d 14px 28px, #5a87d0 28px 42px, #6cf0a0 42px 56px); opacity: .85;
+  -webkit-mask: radial-gradient(circle at 14px 0, #000 12px, transparent 13px) 0 0 / 28px 100% repeat-x; mask: radial-gradient(circle at 14px 0, #000 12px, transparent 13px) 0 0 / 28px 100% repeat-x; }
+
+@media (max-width: 700px) { .pk-wrap, .tree-wrap, .big-heart, .ny-banner { display: none; } .sp-wrap { left: 22%; } }
