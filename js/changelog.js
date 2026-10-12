@@ -1,8 +1,6 @@
 (function () {
   var DW = window.DW, C = (DW.changelog = {});
 
-  // ADD A NEW ENTRY AT THE TOP every time you update the site. newest first.
-  // v: version text, date: optional, title: one line, items: what changed (plain text)
   C.entries = [
     { v: '1.5', date: '12 OCT 2026', title: 'Spooky season', items: [
       'Seasons now last the whole month (October = Halloween, December = Christmas, February = Valentine)',
