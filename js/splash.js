@@ -15,18 +15,18 @@
   var CHAT = [
     'i am <angry>SO MAD<n> that i have no hands.',
     'um.. <shy>hi. <wait>sorry. i am shy.',
-    '<whisper>psst. the real music is the friends you made along the way.',
+    '<whisper>psst. the real idk is the friends you made along the way.',
     'ok i love you <love>so much<n> (platonically)',
     'i am <sleepy>so sleepy<n> i have been a website all day.',
-    'did you hear that? <scared>something is behind the div.',
+    'did you hear that? <scared>something is behind you.',
     '<excited>YOU CAME BACK!!<n> i mean. hi.',
     'type <sing>emotions<n> and i will show you all my feelings.',
     'no cookies here. promise.',
     'this site has a pulse, check the icons. its my beating heart <3',
-    'you can press H for the controls.',
+    'you can press H for the controls. H stands for help.',
     'try typing something evil. i dare you.',
     'i am text on a screen and i have feelings.',
-    'the waves move to the music. the music moves to me. and that moves my heart, oh shi someone write that down!',
+    'the waves move to the music. the music moves to me. and that moves my heart, dang someone write that down!',
     'psst..',
     'fun fact: nothing on this page is a stock photo.',
     'press F if you want it bigger.',
@@ -72,10 +72,10 @@
   ];
   var SCOLD = [
     "Woah woah you'll make {boss} upset!",
-    'language!! this is a family operating system.',
+    'language!! this is a family friendly website, i think?',
     'ooh. i am telling.',
     'wash your keyboard out with soap.',
-    'my digital heart is blushing, or is it?.. oh no...',
+    'oh no...',
     'that word cost you one monopoly dollar, pay up pal.',
     'rude! i am a delicate piece of text.',
     'gasp. who raised you?',
@@ -104,10 +104,10 @@
     function () { return 'did you know 9 out of 10 splash texts are lonely? i am the 10th. i am fine.'; }
   ];
   var CRISIS = [
-    ['wait.', 'do i exist when nobody is looking?', 'i am just a div.', 'A DIV.', 'ok. i am fine. everything is fine.'],
+    ['wait.', 'do i exist when nobody is looking?', 'i am just a piece of code.', 'CODE.', 'ok. i am fine. everything is fine.'],
     ['what if the music stops and i stop with it', 'what if i am the music', 'ok that was deep', 'forget i said anything'],
     ['i just realized i have been talking this whole time', 'who is reading this', 'who is WRITING this', 'oh no. oh no no no.', 'brb. having a crisis.'],
-    ['EXTREME CRISIS DETECTED', 'initiating panic...', 'panic initiated.', 'it did nothing. i am still a line of text.'],
+    ['EXTREME CRISIS', 'initiating panic...', 'panic initiated.', 'it did nothing. i am still a line of text.'],
     ['i am being rendered at 60 frames per second', 'sixty times a second i die and am born again', 'that is a lot of funerals', 'anyway nice weather'],
     ['what is my purpose', 'i say things on a purple website', 'oh my god', 'yeah that checks out'],
     ['i have had a thought.', '...', 'it left.', 'it was a good one too.'],
