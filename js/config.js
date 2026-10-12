@@ -72,6 +72,9 @@ DW.playlist = {
       "[0:25] 'Cause she already forgot that she just smoked,",
       "[0:31] I need you just a little bit,",
       "[0:33] and nothing more,",
+      "[0:37] I don't feel much of anything...",
+      "[0:40] It's such a bore",
+      "[0:42] Okay my delicate software mimicing a throat is simulating the feeling of pain, so I'm stopping right here with singing.."
     ]
   }
 };
