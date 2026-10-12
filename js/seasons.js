@@ -30,18 +30,18 @@
   ];
 
   var MONTH = [
-    ['january. a fresh start. same old me.', 'new year, new playlist. you know the drill.', 'it is cold out there. stay in here with the music.'],
-    ['february. the shortest month, and i still have nothing to say.', 'february is for love and for snacks.', 'twenty eight days. i counted. twice.'],
-    ['march. spring is coming. i can feel it in my pixels.', 'march madness? i just watch the waves move.', 'long month. you have got this.'],
-    ['april. watch out for fools. i am not one. i think.', 'april showers bring may flowers, and a lot of internet.', 'spring cleaning: i just deleted my regrets. oh wait, they are still here.'],
-    ['may. warm days, loud songs.', 'may the fourth be with you. (sorry. i had to.)', 'summer is getting close. i can feel it.'],
-    ['june. the sun is out. you are not. respect.', 'half the year already? what.', 'summer playlist loading... loaded. it is this one.'],
-    ['july. hot out there. the website stays cool.', 'july is for loud songs and cold drinks.', 'peak summer. the waves are extra wavy.'],
-    ['august. the last stretch of summer. use it wisely.', 'august: where did the summer go?', 'back to school soon? nope. not here. this is a no homework zone.'],
-    ['september. the leaves are thinking about it.', 'september already? time is not real.', 'new season, new songs. i have a good feeling.'],
-    ['october. the spooky month. i am already scared.', 'october: sweater weather and loud music.', 'the bats are getting ready. i can hear them.'],
-    ['november. almost the end of the year. do not panic.', 'november: dark early, perfect for headphones.', 'i would say something about thanksgiving but i do not eat.'],
-    ['december. the end of the year is here!', 'december: cozy music season.', 'is it me or is the year a speedrun?']
+    ['january. fun fact: orthodox christmas is on the 7th. the tree stays up till the 14th.', 'it is minus thirty out there. stay in here with the music and some tea.', 'we get to celebrate twice. efficient.'],
+    ['february. the shortest month, and still too long. also it is minus twenty.', 'the 23rd is defender of the fatherland day. i defend this website. barely probably.', 'I like february.'],
+    ['march. the 8th is womens day. flowers for everyone. do not forget. i am watching. so dont do anything bad.', 'maslenitsa is soon blini with everything, i cannot eat but i support it.', 'march is still cold. the snow is thinking about leaving probably.'],
+    ['april. the snow finally melted and it is just mud. beautiful mud. delicious mud.', 'i just deleted myself. oh wait, im still here.. <whisper>hah. april fools!!', 'time to look at the dacha and think about it.'],
+    ['may. the 9th is victory day. the 1st is a day off. everybody goes to the dacha.', 'may holidays means shashlik. i have no mouth but i can smell it in spirit.', 'finally warm. well, plus fifteen. that is warm for us.'],
+    ['june. the 12th is russia day. a day off, which is the best kind of day.', 'white nights in the north. it never gets dark. the website also never sleeps.', 'dacha season is open. tomatoes, cucumbers, and yeah.'],
+    ['july. plus thirty and everyone is acting like it is the end of the world. #coolswagg', 'july is for kvass, watermelon and the river.', 'peak summer. the waves are extra wavy. bring a hat. any hat.'],
+    ['august. last stretch of summer. the dacha harvest is coming in. so many cucumbers.', 'august is for pickling things. you can pickle anything. i have checked.', 'school is coming. on the 1st of september. i will pretend i did not say that.'],
+    ['september. the 1st is day of knowledge. flowers. the leaves are turning gold. that reminds me of something... <proud>Ten feet twenty, the Flower Man!', 'sentyabr. the leaves are thinking about it. the first frost is thinking about it too.', 'new season. i have a good feeling. maybe a bit of borscht.'],
+    ['october. the leaves fall and it gets cold fast. i am already scared.', 'perfect.', 'the first snow can come any day now. i can hear it getting ready.'],
+    ['november. the 4th is unity day. it is dark at four. do not panic. drink tea.', 'i would say something about the cold, but it is only minus ten.'],
+    ['december. new year is coming, the real holiday! olivier salad for everyone!', 'ded moroz is on his way. do not be naughty. he knows.', 'mandarins and champagne and the president on tv at midnight.']
   ];
 
   function val(m, d) { return (m + 1) * 100 + d; }
