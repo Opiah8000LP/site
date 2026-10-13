@@ -696,3 +696,48 @@ body[class*="s-"] #sysname small { opacity: 1; font-weight: bold; color: #ffe9a8
 /* ---------- little secrets (js/eggs.js) ---------- */
 .egg-spin { animation: egg-spin 1.3s ease-in-out; }
 @keyframes egg-spin { from { transform: rotate(0); } to { transform: rotate(1080deg); } }
+
+/* ---------- settings window ---------- */
+@media (max-width: 700px) {
+  #status > .tbtn.noic span { display: inline; font-size: 0; }
+  #status > .tbtn.noic span::after { content: attr(data-s); font-size: 10px; }
+}
+#win-settings .win { width: min(560px, 100%); }
+.set-sec { margin-bottom: 14px; }
+.set-sec h3 { margin-bottom: 6px; padding-bottom: 3px; border-bottom: 1px solid var(--lo); }
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px dashed rgba(117, 9, 154, .35); }
+.set-t { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.set-t b { font: bold 12px var(--font); letter-spacing: .06em; color: #ffffff; text-shadow: 1px 1px 0 var(--ink); }
+.set-t span { font: 11px/1.35 var(--font); color: var(--dim); }
+.set-tg, .set-seg button, .set-pre button, .set-foot button, .set-note button {
+  font: bold 11px var(--font); letter-spacing: .08em; color: #ffffff; text-shadow: 1px 1px 0 var(--ink); cursor: pointer;
+  background: linear-gradient(#d863ed 0 50%, #c245de 50% 100%); border: 1px solid; border-color: var(--hi) var(--lo) var(--lo) var(--hi); box-shadow: 0 0 0 1px var(--ink);
+}
+.set-tg { flex: none; min-width: 54px; min-height: 30px; padding: 0 10px; }
+.set-tg.on, .set-seg button.on, .set-pre button.on { background: linear-gradient(#a2c5ff 0 50%, #6a9ff2 50% 100%); border-color: #ffffff #4a78c8 #4a78c8 #ffffff; }
+.set-tg:active, .set-seg button:active, .set-pre button:active, .set-foot button:active { border-color: var(--lo) var(--hi) var(--hi) var(--lo); }
+.set-seg { display: flex; flex: none; gap: 4px; }
+.set-seg button { min-height: 30px; padding: 0 8px; }
+.set-sl { display: flex; align-items: center; gap: 8px; flex: none; width: min(220px, 48vw); }
+.set-sl output { flex: none; width: 46px; text-align: right; font: 11px var(--mono); color: #ffffff; }
+.set-sl input { flex: 1; min-width: 0; height: 26px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; touch-action: pan-y; cursor: pointer; }
+.set-sl input::-webkit-slider-runnable-track { height: 8px; background: linear-gradient(90deg, var(--pk) var(--v, 50%), var(--ink) var(--v, 50%)); border: 1px solid var(--ink); }
+.set-sl input::-moz-range-track { height: 8px; background: var(--ink); border: 1px solid var(--ink); }
+.set-sl input::-moz-range-progress { height: 8px; background: var(--pk); }
+.set-sl input::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 22px; margin-top: -8px; background: linear-gradient(#ffffff, var(--p3)); border: 1px solid var(--ink); box-shadow: 1px 1px 0 var(--ink); }
+.set-sl input::-moz-range-thumb { width: 14px; height: 20px; border-radius: 0; background: linear-gradient(#ffffff, var(--p3)); border: 1px solid var(--ink); }
+.set-sl input:focus-visible { outline: 1px dashed #ffffff; outline-offset: 2px; }
+.set-pre { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 4px; }
+.set-pre button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 30px; padding: 0 4px; font-size: 10px; }
+.set-pre i { width: 11px; height: 11px; flex: none; border: 1px solid #ffffff; box-shadow: 0 0 0 1px var(--ink); }
+.set-note { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; padding: 6px 8px; font: 11px var(--font); color: #ffffff; background: var(--ink); border: 1px solid var(--hi); }
+.set-note[hidden] { display: none; }
+.set-note button { min-height: 24px; padding: 0 10px; }
+.set-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.set-foot button { min-height: 30px; padding: 0 12px; }
+.set-foot p { font: 11px var(--font); color: var(--dim); }
+@media (max-width: 560px) {
+  .set-row { flex-wrap: wrap; }
+  .set-sl { width: 100%; }
+  .set-pre { grid-template-columns: repeat(2, 1fr); }
+}
