@@ -77,7 +77,8 @@ DW.playlist = {
       "[0:22] Stupid, stupid, stupid, girl",
       "[0:23] is tweaking at the party,"
     ]
-  }
+  },
+  'music9.mp3': { title: 'Plastic You', artist: 'Outdate Techno', album: 'Single / 2026' }
 };
 DW.defaultArtist = 'Unknown Artist';
 
