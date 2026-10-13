@@ -3,7 +3,7 @@ TODO
 [x] make a website
 [x] make it purple
 [x] make it MORE purple
-[ ] make it even more purple (is that possible. investigate)
+[ ] make fun intertaining
 [ ] learn what a "build step" is
-[ ] stop adding stuff at 3am
+[ ] stop adding stuff i have to release the website
 [ ] actually stop
