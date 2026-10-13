@@ -694,9 +694,5 @@ body[class*="s-"] #sysname small { opacity: 1; font-weight: bold; color: #ffe9a8
 .gh-wrap { pointer-events: auto; cursor: pointer; }
 
 /* ---------- little secrets (js/eggs.js) ---------- */
-.egg-peek { position: fixed; left: 24px; bottom: 0; z-index: 8; width: clamp(90px, 16vmin, 170px); pointer-events: none; transform: translateY(105%); transition: transform .5s cubic-bezier(.2, 1.4, .4, 1); }
-.egg-peek.in { transform: translateY(8%); }
-.egg-peek img { display: block; width: 100%; height: auto; }
 .egg-spin { animation: egg-spin 1.3s ease-in-out; }
 @keyframes egg-spin { from { transform: rotate(0); } to { transform: rotate(1080deg); } }
-body.gaming .egg-peek { display: none; }
